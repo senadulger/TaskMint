@@ -1,0 +1,4 @@
+# .gitignore dosyası
+
+node_modules
+.env
