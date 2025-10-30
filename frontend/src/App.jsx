@@ -1,27 +1,25 @@
-// src/App.jsx
-
 import React from 'react';
-// 1. Router için gerekli bileşenleri import et
 import { Routes, Route } from 'react-router-dom';
 
-// 2. Oluşturduğumuz sayfaları import et
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
+import StatisticsPage from './pages/StatisticsPage';
+import MainLayout from './components/MainLayout';
 
 function App() {
   return (
-    // 3. Rota (adres) yapısını tanımla
     <Routes>
-      {/* Tarayıcıda adres '/' (ana sayfa) veya '/login' ise LoginPage'i göster */}
-      <Route path="/" element={<LoginPage />} />
       <Route path="/login" element={<LoginPage />} />
-
-      {/* Tarayıcıda adres '/register' ise RegisterPage'i göster */}
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/" element={<LoginPage />} /> 
 
-      {/* Tarayıcıda adres '/dashboard' ise DashboardPage'i göster */}
-      <Route path="/dashboard" element={<DashboardPage />} />
+
+      <Route element={<MainLayout />}>
+        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/tasks" element={<DashboardPage />} /> 
+        <Route path="/analysis" element={<StatisticsPage />} />
+      </Route>
     </Routes>
   );
 }

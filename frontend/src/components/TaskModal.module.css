@@ -1,0 +1,122 @@
+.modalOverlay {
+  position: fixed; /* Ekranı kaplar */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7); /* Yarı şeffaf siyah arka plan */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background-color: #1B1B2F; /* Koyu kart rengi */
+  padding: 2rem;
+  border-radius: 8px;
+  border: 1px solid #3A3A5C;
+  width: 100%;
+  max-width: 500px; /* Modal genişliği */
+  position: relative;
+}
+
+.closeButton {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: #A0A0B8;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.modalContent h2 {
+  color: #F0F0FF;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.formGroup {
+  margin-bottom: 1rem;
+}
+
+.formGroup label {
+  display: block;
+  color: #A0A0B8;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.formGroup input[type="text"],
+.formGroup input[type="date"],
+.formGroup textarea,
+.formGroup select {
+  width: 100%;
+  background-color: #0F0F1E;
+  border: 1px solid #3A3A5C;
+  color: #F0F0FF;
+  padding: 0.75rem;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.formGroup textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.row {
+  display: flex;
+  gap: 1rem;
+}
+.row > .formGroup {
+  flex: 1; /* İki alanı eşit böl */
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #A0A0B8;
+  cursor: pointer;
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+  border-top: 1px solid #3A3A5C;
+  padding-top: 1.5rem;
+}
+
+.cancelButton {
+  background-color: #3A3A5C;
+  color: #F0F0FF;
+  border: none;
+  border-radius: 6px;
+  padding: 0.75rem 1.25rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.submitButton {
+  background-color: #5A80FF; /* Ana vurgu rengi */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.75rem 1.25rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.error {
+  color: #f94144;
+  background-color: rgba(249, 65, 68, 0.1);
+  padding: 0.5rem;
+  border-radius: 4px;
+  text-align: center;
+  margin-bottom: 1rem;
+}

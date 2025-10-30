@@ -1,15 +1,15 @@
-// src/pages/RegisterPage.jsx
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import styles from './AuthForm.module.css'; // Aynı CSS'i kullanır
+import styles from './Auth.module.css'; 
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const RegisterPage = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -21,73 +21,80 @@ const RegisterPage = () => {
         email,
         password,
       });
-      console.log('Kayıt başarılı:', response.data);
       localStorage.setItem('token', response.data.token);
       navigate('/dashboard');
     } catch (err) {
-      console.error('Kayıt hatası:', err.response?.data?.message || err.message);
-      setError(err.response?.data?.message || 'Bir hata oluştu.');
+      setError(err.response?.data?.message || 'Kayıt oluşturulamadı.');
     }
   };
 
   return (
-    // 1. Ana container (İki sütunu kapsar)
-    <div className={styles.authContainer}>
-
-      {/* 2. Sol Taraf (Kapak) - Giriş sayfasıyla aynı */}
-      <div className={styles.coverSide}>
-        <div className={styles.coverContent}>
+    <div className={styles.authPage}>
+      <div className={styles.brandingSide}>
+        <div className={styles.brandingContent}>
           <h1>Task Manager</h1>
-          <p>Görevlerinizi kolayca yönetin ve takip edin.</p>
+          <p>Manage Your Tasks. Achieve Your Goals.</p>
         </div>
       </div>
 
-      {/* 3. Sağ Taraf (Form) */}
       <div className={styles.formSide}>
-        <form className={styles.authForm} onSubmit={handleSubmit}>
-          <h2>Kayıt Ol</h2>
-          
-          {error && <div className={styles.errorBanner}>{error}</div>}
+        <div className={styles.authContainer}>
+          <div className={styles.tabContainer}>
+            <Link to="/login" className={styles.tab}>Sign In</Link>
+            <button className={`${styles.tab} ${styles.active}`}>Sign Up</button>
+          </div>
 
-          <div className={styles.formGroup}>
-            <label htmlFor="name">İsim</label>
-            <input
-              type="text"
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label htmlFor="password">Şifre</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          <button type="submit" className={styles.submitButton}>
-            Kayıt Ol
-          </button>
-          <p className={styles.switchLink}>
-            Zaten bir hesabınız var mı? <Link to="/login">Giriş Yapın</Link>
-          </p>
-        </form>
+          <h2>Create Your Account</h2>
+          <p style={{ color: '#A0A0B8', marginBottom: '2rem' }}>Get started in seconds.</p>
+
+          <form className={styles.form} onSubmit={handleSubmit}>
+            {error && <p style={{ color: 'red' }}>{error}</p>}
+            
+            <div className={styles.formGroup}>
+              <label htmlFor="name">Name</label>
+              <input
+                type="text"
+                id="name"
+                placeholder="Enter your name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label htmlFor="email">Email</label>
+              <input
+                type="email"
+                id="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className={styles.passwordWrapper}>
+              <label htmlFor="password">Password</label>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                id="password"
+                placeholder="Create a password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <span onClick={() => setShowPassword(!showPassword)} className={styles.eyeIcon}>
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </span>
+            </div>
+
+            <button type="submit" className={styles.submitButton}>
+              Sign Up
+            </button>
+          </form>
+        </div>
       </div>
-
     </div>
   );
 };

@@ -1,0 +1,152 @@
+.authPage {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  background-color: #0F0F1E; /* Ana koyu arka plan */
+}
+
+/* Sol Taraf: Marka/Başlık */
+.brandingSide {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  color: #F0F0FF;
+}
+
+.brandingContent {
+  max-width: 400px;
+}
+
+.brandingContent h1 {
+  font-size: 3.5rem; /* "Task Manager" başlığı */
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.brandingContent p {
+  font-size: 1.1rem; /* Tagline */
+  color: #A0A0B8;
+}
+
+/* Sağ Taraf: Form */
+.formSide {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #1B1B2F; /* Kart arka planı */
+  padding: 2rem;
+}
+
+.authContainer {
+  width: 100%;
+  max-width: 400px;
+  color: #F0F0FF;
+}
+
+/* Sekmeler (Sign In / Sign Up) */
+.tabContainer {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #3A3A5C;
+}
+
+.tab {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #A0A0B8; /* İnaktif sekme rengi */
+  background: none;
+  border: none;
+  padding: 0.5rem 0.25rem;
+  cursor: pointer;
+  text-decoration: none;
+  position: relative;
+  bottom: -1px; /* Kenarlıkla hizalamak için */
+}
+
+.tab.active {
+  color: #F0F0FF; /* Aktif sekme rengi */
+  border-bottom: 3px solid #5A80FF; /* Aktif mavi çizgi */
+}
+
+/* Form Alanları */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.formGroup label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #A0A0B8;
+}
+
+.formGroup input,
+.passwordWrapper input {
+  background-color: #0F0F1E; /* Input arka planı */
+  border: 1px solid #3A3A5C;
+  color: #F0F0FF;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.formGroup input::placeholder {
+  color: #5B5B7A;
+}
+
+.passwordWrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.eyeIcon {
+  position: absolute;
+  bottom: 0.75rem;
+  right: 1rem;
+  color: #A0A0B8;
+  cursor: pointer;
+}
+
+.forgotLink {
+  font-size: 0.9rem;
+  color: #A0A0B8;
+  text-align: right;
+  text-decoration: none;
+  margin-top: 0.25rem; 
+}
+
+.forgotLink:hover {
+  color: #5A80FF;
+}
+
+.submitButton {
+  background-color: #5A80FF;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.8rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+.termsText {
+  font-size: 0.8rem;
+  color: #A0A0B8;
+  text-align: center;
+  margin-top: 2rem;
+}

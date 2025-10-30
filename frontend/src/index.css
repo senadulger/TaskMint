@@ -1,6 +1,3 @@
-/* src/index.css */
-
-/* Temel CSS Reset */
 * {
   margin: 0;
   padding: 0;
@@ -9,14 +6,14 @@
 }
 
 body {
-  /* Arka plan rengini buradan kaldırıyoruz, çünkü artık sütunlar kendi renklerini yönetiyor */
-  /* background-color: #f4f7f6; */
-  color: #333;
+  /* Koyu mod ana arka plan rengi */
+  /* Dashboard vb. için bunu Koyu Modun ana rengi yapıyoruz */
+  background-color: #0F0F1E; 
+  color: #F0F0FF; /* Varsayılan metin rengi */
 }
 
 #root {
   min-height: 100vh;
-  /* #root'un da dikey bir flex container olmasını sağlıyoruz ki içindeki .authContainer düzgün yayılsın */
   display: flex;
   flex-direction: column;
 }

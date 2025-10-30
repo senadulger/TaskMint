@@ -1,16 +1,14 @@
-// src/pages/LoginPage.jsx
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
-// Güncellenmiş CSS modülümüzü import ediyoruz
-import styles from './AuthForm.module.css';
+import styles from './Auth.module.css'; 
+import { FaEye, FaEyeSlash } from 'react-icons/fa'; 
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -21,62 +19,67 @@ const LoginPage = () => {
         email,
         password,
       });
-      console.log('Giriş başarılı:', response.data);
       localStorage.setItem('token', response.data.token);
       navigate('/dashboard');
     } catch (err) {
-      console.error('Giriş hatası:', err.response?.data?.message || err.message);
-      setError(err.response?.data?.message || 'Bir hata oluştu.');
+      setError(err.response?.data?.message || 'Giriş yapılamadı.');
     }
   };
 
   return (
-    // 1. Ana container (İki sütunu kapsar)
-    <div className={styles.authContainer}>
-      
-      {/* 2. Sol Taraf (Kapak) */}
-      <div className={styles.coverSide}>
-        <div className={styles.coverContent}>
+    <div className={styles.authPage}>
+      <div className={styles.brandingSide}>
+        <div className={styles.brandingContent}>
           <h1>Task Manager</h1>
+          <p>Manage Your Tasks. Achieve Your Goals.</p>
         </div>
       </div>
 
-      {/* 3. Sağ Taraf (Form) */}
       <div className={styles.formSide}>
-        <form className={styles.authForm} onSubmit={handleSubmit}>
-          <h2>Giriş Yap</h2>
-          
-          {error && <div className={styles.errorBanner}>{error}</div>}
+        <div className={styles.authContainer}>
+          <div className={styles.tabContainer}>
+            <button className={`${styles.tab} ${styles.active}`}>Sign In</button>
+            <Link to="/register" className={styles.tab}>Sign Up</Link>
+          </div>
 
-          <div className={styles.formGroup}>
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label htmlFor="password">Şifre</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          <button type="submit" className={styles.submitButton}>
-            Giriş Yap
-          </button>
-          <p className={styles.switchLink}>
-            Hesabınız yok mu? <Link to="/register">Kayıt Olun</Link>
-          </p>
-        </form>
+          <form className={styles.form} onSubmit={handleSubmit}>
+            {error && <p style={{ color: 'red' }}>{error}</p>}
+            
+            <div className={styles.formGroup}>
+              <label htmlFor="email">Email</label>
+              <input
+                type="email"
+                id="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className={styles.passwordWrapper}>
+              <label htmlFor="password">Password</label>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                id="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <span onClick={() => setShowPassword(!showPassword)} className={styles.eyeIcon}>
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </span>
+            </div>
+
+            <Link to="/forgot-password" className={styles.forgotLink}>Forgot Password?</Link>
+
+            <button type="submit" className={styles.submitButton}>
+              Sign In
+            </button>
+          </form>
+        </div>
       </div>
-      
     </div>
   );
 };
