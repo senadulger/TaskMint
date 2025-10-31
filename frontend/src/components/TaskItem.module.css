@@ -2,36 +2,109 @@
   background-color: #1B1B2F;
   border-radius: 8px;
   padding: 1.25rem;
-  border: 1px solid #3A3A5C;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 150px; 
+  min-height: 160px;
   cursor: pointer;
   transition: all 0.2s ease;
+  
+  border: 1px solid #3A3A5C;
+  border-left-width: 5px; /* Sol kenarlık kalın */
+  /* Kenarlık rengi dinamik olarak .border... sınıflarından gelecek */
+  border-left-color: #3A3A5C; /* Varsayılan kenarlık rengi */
 }
 
 .taskCard:hover {
-  border-color: #5A80FF;
   transform: translateY(-4px);
-  box-shadow: 0 4px 20px rgba(90, 128, 255, 0.1);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
 }
 
+/* --- DÜZELTİLDİ: Kenarlık Renkleri --- */
+/* Bu sınıflar ARKA PLANI DEĞİL, SADECE SOL KENARLIĞI değiştirir */
+.borderJob { border-left-color: #5A80FF; }
+.borderPersonal { border-left-color: #A076F9; }
+.borderHobby { border-left-color: #FF9F40; }
+.borderOther { border-left-color: #577590; }
+
+.borderJob:hover { border-color: #5A80FF; }
+.borderPersonal:hover { border-color: #A076F9; }
+.borderHobby:hover { border-color: #FF9F40; }
+.borderOther:hover { border-color: #577590; }
+
+.borderUrgent { 
+  border-left-color: #FF4D4D; /* KIRMIZI */
+  border-color: #FF4D4D; 
+  background-color: rgba(255, 77, 77, 0.1);
+}
+
+.borderUrgent:hover { border-color: #FF4D4D; }
+
+.borderCompleted { 
+  border-left-color: #3DCC91; /* YEŞİL */
+  border-color: #3DCC91;
+  background-color: rgba(61, 204, 145, 0.1);
+}
+
+.borderCompleted:hover { border-color: #3DCC91; }
+
+/* Üst Kısım: Başlık ve İkonlar */
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
 .cardHeader h3 {
   color: #F0F0FF;
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   font-weight: 600;
   line-height: 1.4;
+  flex-grow: 1;
+}
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+.iconButton {
+  background: none;
+  border: none;
+  color: #A0A0B8;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.iconButton:hover { color: #F0F0FF; }
+.deleteButton:hover { color: #FF4D4D; }
+
+/* Orta Kısım: Tarih/Zaman/Uyarı */
+.cardMiddle {
+  margin: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-height: 20px; /* Boş olduğunda kaymayı engeller */
+}
+.dateTime {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #A0A0B8;
+  font-size: 0.9rem;
+}
+.urgentText {
+  color: #FF4D4D;
+  font-weight: 600;
 }
 
+/* Alt Kısım: Kategori ve Checkbox */
 .cardFooter {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 1rem; /* Başlıktan ayırır */
 }
 
-/* Kategori Etiketleri */
+/* --- DÜZELTİLDİ: Kategori Etiket Stilleri --- */
 .categoryTag {
   font-size: 0.8rem;
   font-weight: 500;
@@ -39,28 +112,19 @@
   border-radius: 12px;
   display: inline-block;
   color: #fff;
+  /* Arka plan rengi .tag... sınıflarından gelecek */
 }
+.tagJob { background-color: #5A80FF; }
+.tagPersonal { background-color: #A076F9; }
+.tagHobby { background-color: #FF9F40; }
+.tagOther { background-color: #577590; }
 
-/* Renkler (screen.png'ye göre) */
-.catJob { background-color: #5A80FF; } /* Mavi */
-.catPersonal { background-color: #A076F9; } /* Mor */
-.catHobby { background-color: #FF9F40; } /* Turuncu */
-.catOther { background-color: #577590; } /* Gri/Mavi */
-
-
-/* Durum Etiketleri */
-.status {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.9rem;
-  font-weight: 500;
+/* Checkbox stilleri */
+.checkPending {
+  font-size: 1.5rem;
+  color: #3A3A5C;
 }
-
-.statusCompleted {
-  color: #3DCC91; /* Yeşil */
-}
-
-.statusUrgent {
-  color: #FF4D4D; /* Kırmızı */
+.checkCompleted {
+  font-size: 1.5rem;
+  color: #3DCC91;
 }

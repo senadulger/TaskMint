@@ -2,10 +2,9 @@ import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import styles from './Navbar.module.css';
 
-// Logo (Twitter/X logosu)
 const Logo = () => (
   <svg viewBox="0 0 24 24" fill="white" width="28" height="28">
-    <path />
+    <path  />
   </svg>
 );
 
@@ -14,38 +13,35 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const handleSignOut = () => {
-    localStorage.removeItem('token'); 
-    navigate('/login'); 
+    localStorage.removeItem('token');
+    navigate('/login');
   };
 
   return (
     <nav className={styles.navbar}>
       <div className={styles.navContent}>
+        {/* Sol Taraf: Logo ve Linkler */}
         <div className={styles.navLeft}>
           <div className={styles.logo}>
             <Logo />
             <span>Task Manager</span>
           </div>
-          <div className={styles.navLinks}>
-            <NavLink to="/dashboard" className={({ isActive }) => isActive ? styles.activeLink : ''}>
-              Dashboard
-            </NavLink>
-            <NavLink to="/tasks" className={({ isActive }) => isActive ? styles.activeLink : ''}>
-              Tasks
-            </NavLink>
-            <NavLink to="/analysis" className={({ isActive }) => isActive ? styles.activeLink : ''}>
-              Analysis
-            </NavLink>
-          </div>
+          <NavLink to="/dashboard" className={({ isActive }) => `${styles.navLink} ${isActive ? styles.activeLink : ''}`}>
+            Dashboard
+          </NavLink>
+          <NavLink to="/tasks" className={({ isActive }) => `${styles.navLink} ${isActive ? styles.activeLink : ''}`}>
+            Tasks
+          </NavLink>
+          <NavLink to="/analysis" className={({ isActive }) => `${styles.navLink} ${isActive ? styles.activeLink : ''}`}>
+            Analysis
+          </NavLink>
         </div>
 
         <div className={styles.profileDropdown}>
           <button 
             className={styles.profileButton} 
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-          >
-          </button>
-          
+          />
           {isDropdownOpen && (
             <div className={styles.dropdownMenu}>
               <button onClick={handleSignOut}>

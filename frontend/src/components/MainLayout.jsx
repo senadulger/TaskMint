@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet, Navigate } from 'react-router-dom';
 import Navbar from './Navbar';
-import styles from './MainLayout.module.css';
+import styles from './MainLayout.module.css'; 
 
 const MainLayout = () => {
   const token = localStorage.getItem('token');
@@ -12,9 +12,9 @@ const MainLayout = () => {
 
   return (
     <div className={styles.layout}>
-      <Navbar />
+      <Navbar /> 
       <main className={styles.content}>
-        <Outlet /> 
+        <Outlet />
       </main>
     </div>
   );

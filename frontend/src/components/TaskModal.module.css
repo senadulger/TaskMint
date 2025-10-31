@@ -51,6 +51,7 @@
 
 .formGroup input[type="text"],
 .formGroup input[type="date"],
+.formGroup input[type="time"],
 .formGroup textarea,
 .formGroup select {
   width: 100%;
@@ -119,4 +120,58 @@
   border-radius: 4px;
   text-align: center;
   margin-bottom: 1rem;
+}
+
+/* Tarih ve Saat input'larını yan yana getirmek için */
+.dateTimeContainer {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Tarih input'u daha geniş olsun */
+.dateInput {
+  flex: 3;
+}
+/* Saat input'u daha dar olsun */
+.timeInput {
+  flex: 2;
+}
+
+
+/* --- YENİ: Dinamik Renkli Kategori Seçimi --- */
+
+/* Geçiş efekti */
+.formGroup select {
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Seçeneklerin (açılan menünün) arkaplanı koyu kalsın */
+.formGroup select option {
+  background-color: #1B1B2F;
+  color: #F0F0FF;
+}
+
+/* Dashboard'daki renk kodlarıyla eşleşen stiller */
+.formGroup select[data-category="Job"] {
+  background-color: #5A80FF; /* Mavi */
+  border-color: #5A80FF;
+  color: white;
+}
+
+.formGroup select[data-category="Personal"] {
+  background-color: #A076F9; /* Mor */
+  border-color: #A076F9;
+  color: white;
+}
+
+.formGroup select[data-category="Hobby"] {
+  background-color: #FF9F40; /* Turuncu */
+  border-color: #FF9F40;
+  color: white;
+}
+
+.formGroup select[data-category="Other"] {
+  background-color: #577590; /* Gri */
+  border-color: #577590;
+  color: white;
 }

@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import styles from './TaskModal.module.css'; 
+import styles from './TaskModal.module.css';
 
 const TaskModal = ({ onClose, taskToEdit, onTaskSaved }) => {
-  // Form state'i
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('Job'); 
+  const [category, setCategory] = useState('Job');
   const [dueDate, setDueDate] = useState('');
+  const [dueTime, setDueTime] = useState('09:00'); 
   const [status, setStatus] = useState('Pending');
   const [error, setError] = useState(null);
 
@@ -19,6 +19,9 @@ const TaskModal = ({ onClose, taskToEdit, onTaskSaved }) => {
       setStatus(taskToEdit.status);
       if (taskToEdit.dueDate) {
         setDueDate(new Date(taskToEdit.dueDate).toISOString().split('T')[0]);
+      }
+      if (taskToEdit.dueTime) { // YENİ
+        setDueTime(taskToEdit.dueTime);
       }
     }
   }, [taskToEdit]);
@@ -35,7 +38,7 @@ const TaskModal = ({ onClose, taskToEdit, onTaskSaved }) => {
       },
     };
 
-    const taskData = { title, description, category, status, dueDate };
+    const taskData = { title, description, category, status, dueDate, dueTime };
 
     try {
       if (taskToEdit) {
@@ -47,10 +50,10 @@ const TaskModal = ({ onClose, taskToEdit, onTaskSaved }) => {
       } else {
         await axios.post('http://localhost:5000/api/tasks', taskData, config);
       }
-      onTaskSaved(); 
-      onClose(); 
+      onTaskSaved();
+      onClose();
     } catch (err) {
-      setError('An error occurred while saving the task.');
+      setError('Could not save the task.');
       console.error(err);
     }
   };
@@ -60,7 +63,7 @@ const TaskModal = ({ onClose, taskToEdit, onTaskSaved }) => {
       <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
         <button className={styles.closeButton} onClick={onClose}>×</button>
         <h2>{taskToEdit ? 'Edit Task' : 'Create New Task'}</h2>
-
+        
         {error && <p className={styles.error}>{error}</p>}
 
         <form onSubmit={handleSubmit}>
@@ -87,21 +90,33 @@ const TaskModal = ({ onClose, taskToEdit, onTaskSaved }) => {
           </div>
 
           <div className={styles.row}>
-            <div className={styles.formGroup}>
+            <div className={styles.formGroup} style={{ flex: 2 }}>
               <label htmlFor="dueDate">Deadline</label>
-              <input
-                type="date"
-                id="dueDate"
-                value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-              />
+              <div className={styles.dateTimeContainer}>
+                <input
+                  type="date"
+                  id="dueDate"
+                  value={dueDate}
+                  onChange={(e) => setDueDate(e.target.value)}
+                  className={styles.dateInput}
+                />
+                <input
+                  type="time" 
+                  id="dueTime"
+                  value={dueTime}
+                  onChange={(e) => setDueTime(e.target.value)}
+                  className={styles.timeInput}
+                />
+              </div>
             </div>
-            <div className={styles.formGroup}>
+            
+            <div className={styles.formGroup} style={{ flex: 1 }}>
               <label htmlFor="category">Category</label>
               <select
                 id="category"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
+                data-category={category} 
               >
                 <option value="Job">Job</option>
                 <option value="Personal">Personal</option>
@@ -126,10 +141,10 @@ const TaskModal = ({ onClose, taskToEdit, onTaskSaved }) => {
 
           <div className={styles.formActions}>
             <button type="button" className={styles.cancelButton} onClick={onClose}>
-              İptal
+              Cancel
             </button>
             <button type="submit" className={styles.submitButton}>
-              {taskToEdit ? 'Update' : 'Create'}
+              {taskToEdit ? 'Save Changes' : 'Create'}
             </button>
           </div>
         </form>

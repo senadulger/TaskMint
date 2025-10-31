@@ -12,12 +12,11 @@ function App() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
-      <Route path="/" element={<LoginPage />} /> 
-
+      <Route path="/" element={<LoginPage />} />
 
       <Route element={<MainLayout />}>
         <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/tasks" element={<DashboardPage />} /> 
+        <Route path="/tasks" element={<DashboardPage />} />
         <Route path="/analysis" element={<StatisticsPage />} />
       </Route>
     </Routes>
