@@ -63,6 +63,11 @@
   font-size: 1rem;
 }
 
+.formGroup input[type="date"]::-webkit-calendar-picker-indicator,
+.formGroup input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.6); /* İkonları koyudan açığa çevirir */
+}
+
 .formGroup textarea {
   min-height: 100px;
   resize: vertical;
@@ -122,17 +127,14 @@
   margin-bottom: 1rem;
 }
 
-/* Tarih ve Saat input'larını yan yana getirmek için */
 .dateTimeContainer {
   display: flex;
   gap: 0.5rem;
 }
 
-/* Tarih input'u daha geniş olsun */
 .dateInput {
   flex: 3;
 }
-/* Saat input'u daha dar olsun */
 .timeInput {
   flex: 2;
 }

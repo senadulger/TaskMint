@@ -6,8 +6,6 @@ const mongoose = require('mongoose');
 // @route   GET /api/tasks
 // @access  Private (Giriş Gerekli)
 const getTasks = asyncHandler(async (req, res) => {
-  // Sadece giriş yapan kullanıcının görevlerini bul
-  // req.user, bizim authMiddleware'den (protect) geliyor
   const tasks = await Task.find({ user: req.user._id });
   res.json(tasks);
 });
@@ -20,11 +18,11 @@ const createTask = asyncHandler(async (req, res) => {
 
   if (!title || !category || !status) {
     res.status(400);
-    throw new Error('Lütfen başlık, kategori ve durum alanlarını doldurun');
+    throw new Error('Please provide title, category, and status');
   }
 
   const task = new Task({
-    user: req.user._id, // Görevi giriş yapan kullanıcıya ata
+    user: req.user._id, 
     title,
     description,
     category,
@@ -34,7 +32,7 @@ const createTask = asyncHandler(async (req, res) => {
   });
 
   const createdTask = await task.save();
-  res.status(201).json(createdTask); // 201 = Başarıyla Oluşturuldu
+  res.status(201).json(createdTask); 
 });
 
 // @desc    Bir görevi güncelle
@@ -44,17 +42,16 @@ const updateTask = asyncHandler(async (req, res) => {
   const task = await Task.findById(req.params.id);
 
   if (!task) {
-    res.status(404); // 404 Bulunamadı
-    throw new Error('Görev bulunamadı');
+    res.status(404); 
+    throw new Error('Task not found');
   }
 
   // Güvenlik: Görev, bu kullanıcıya mı ait?
   if (task.user.toString() !== req.user._id.toString()) {
-    res.status(401); // Yetkisiz
-    throw new Error('Bu görevi güncellemeye yetkiniz yok');
+    res.status(401); 
+    throw new Error('You are not authorized to update this task');
   }
 
-  // Görevi yeni verilerle güncelle
   task.title = req.body.title || task.title;
   task.description = req.body.description || task.description;
   task.category = req.body.category || task.category;
@@ -74,29 +71,26 @@ const deleteTask = asyncHandler(async (req, res) => {
 
   if (!task) {
     res.status(404);
-    throw new Error('Görev bulunamadı');
+    throw new Error('Task not found');
   }
 
-  // Güvenlik: Görev, bu kullanıcıya mı ait?
   if (task.user.toString() !== req.user._id.toString()) {
     res.status(401);
-    throw new Error('Bu görevi silmeye yetkiniz yok');
+    throw new Error('You are not authorized to delete this task');
   }
 
-  await task.deleteOne(); // Görevi sil
-  res.json({ message: 'Görev başarıyla silindi' });
+  await task.deleteOne(); 
+  res.json({ message: 'Task successfully deleted' });
 });
 
 // @desc    Kullanıcının görev istatistiklerini al
 // @route   GET /api/tasks/stats
 // @access  Private
-const getTaskStats = asyncHandler(async (req, res) => {
-  // 1. Sadece giriş yapmış kullanıcıya ait görevleri bul
+const getTaskStats = asyncHandler(async (req, res) => {l
   const matchStage = {
     $match: { user: new mongoose.Types.ObjectId(req.user._id) },
   };
 
-  // 2. Görevleri önce kategoriye, sonra duruma göre grupla ve say
   const groupStage1 = {
     $group: {
       _id: {
@@ -107,32 +101,28 @@ const getTaskStats = asyncHandler(async (req, res) => {
     },
   };
 
-  // 3. Çıktıyı tekrar kategoriye göre grupla
-  //    ve durum/sayı bilgilerini bir diziye at
   const groupStage2 = {
     $group: {
-      _id: '$_id.category', // Kategoriye göre grupla
+      _id: '$_id.category', 
       statuses: {
         $push: {
           status: '$_id.status',
           count: '$count',
         },
       },
-      totalTasks: { $sum: '$count' }, // Bu kategorideki toplam görev sayısı
+      totalTasks: { $sum: '$count' }, 
     },
   };
 
-  // 4. Çıktının adını "category" olarak değiştir
   const projectStage = {
     $project: {
-      _id: 0, // _id alanını kaldır
-      category: '$_id', // _id'nin adını 'category' yap
+      _id: 0, 
+      category: '$_id', 
       statuses: 1,
       totalTasks: 1,
     },
   };
 
-  // 5. Aggregation Pipeline'ı çalıştır
   const stats = await Task.aggregate([
     matchStage,
     groupStage1,
@@ -142,7 +132,7 @@ const getTaskStats = asyncHandler(async (req, res) => {
 
   if (!stats) {
     res.status(404);
-    throw new Error('İstatistik bulunamadı');
+    throw new Error('Statistics not found');
   }
 
   res.json(stats);

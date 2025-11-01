@@ -10,7 +10,7 @@ const TaskModal = ({ onClose, taskToEdit, onTaskSaved }) => {
   const [dueTime, setDueTime] = useState('09:00'); 
   const [status, setStatus] = useState('Pending');
   const [error, setError] = useState(null);
-
+  
   useEffect(() => {
     if (taskToEdit) {
       setTitle(taskToEdit.title);
@@ -20,7 +20,7 @@ const TaskModal = ({ onClose, taskToEdit, onTaskSaved }) => {
       if (taskToEdit.dueDate) {
         setDueDate(new Date(taskToEdit.dueDate).toISOString().split('T')[0]);
       }
-      if (taskToEdit.dueTime) { // YENİ
+      if (taskToEdit.dueTime) { 
         setDueTime(taskToEdit.dueTime);
       }
     }

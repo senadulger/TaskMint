@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User'); // User modelimizi import ediyoruz
+const User = require('../models/User');
 
 const protect = async (req, res, next) => {
   let token;
@@ -19,13 +19,13 @@ const protect = async (req, res, next) => {
     } catch (error) {
       console.error(error);
       res.status(401); 
-      throw new Error('Yetkili değil, token başarısız');
+      throw new Error('Not authorized, token failed');
     }
   }
 
   if (!token) {
     res.status(401);
-    throw new Error('Yetkili değil, token bulunamadı');
+    throw new Error('Not authorized, token not found');
   }
 };
 

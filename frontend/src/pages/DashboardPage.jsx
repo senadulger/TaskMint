@@ -52,7 +52,7 @@ const DashboardPage = () => {
   const handleTaskSaved = () => { fetchTasks(); };
 
   const categories = ['All', 'Job', 'Personal', 'Hobby', 'Other'];
-  const statuses = ['All', 'Pending', 'Completed'];
+  const statuses = ['All', 'Incomplete', 'Completed'];
   const filteredTasks = useMemo(() => {
     return tasks.filter((task) => {
       const statusMatch = statusFilter === 'All' || task.status === statusFilter;

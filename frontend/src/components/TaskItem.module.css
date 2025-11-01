@@ -10,9 +10,8 @@
   transition: all 0.2s ease;
   
   border: 1px solid #3A3A5C;
-  border-left-width: 5px; /* Sol kenarlık kalın */
-  /* Kenarlık rengi dinamik olarak .border... sınıflarından gelecek */
-  border-left-color: #3A3A5C; /* Varsayılan kenarlık rengi */
+  border-left-width: 5px; 
+  border-left-color: #3A3A5C; 
 }
 
 .taskCard:hover {
@@ -20,8 +19,7 @@
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
 }
 
-/* --- DÜZELTİLDİ: Kenarlık Renkleri --- */
-/* Bu sınıflar ARKA PLANI DEĞİL, SADECE SOL KENARLIĞI değiştirir */
+
 .borderJob { border-left-color: #5A80FF; }
 .borderPersonal { border-left-color: #A076F9; }
 .borderHobby { border-left-color: #FF9F40; }
@@ -48,7 +46,6 @@
 
 .borderCompleted:hover { border-color: #3DCC91; }
 
-/* Üst Kısım: Başlık ve İkonlar */
 .cardHeader {
   display: flex;
   justify-content: space-between;

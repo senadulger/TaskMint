@@ -11,17 +11,17 @@ import {
 } from 'react-icons/fa';
 
 const formatDisplayDate = (dateString) => {
-  if (!dateString) return null;
-  const date = new Date(dateString.replace(/-/g, '/')); 
-  
-  const today = new Date();
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
+  if (!dateString) return null;
+  const date = new Date(dateString); 
+  
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
 
-  if (date.toDateString() === today.toDateString()) return 'Bugün';
-  if (date.toDateString() === tomorrow.toDateString()) return 'Yarın';
+  if (date.toDateString() === today.toDateString()) return 'Today';
+  if (date.toDateString() === tomorrow.toDateString()) return 'Tomorrow';
 
-  return date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' });
+  return date.toLocaleDateString('en-US', { day: 'numeric', month: 'long' });
 };
 
 const TaskItem = ({ task, onDelete, onEdit }) => {
@@ -54,6 +54,7 @@ const TaskItem = ({ task, onDelete, onEdit }) => {
       return { isUrgent: false, isCompleted: false, element: null };
     }
     
+    /* bu kısım tekrar değerlendirilecek */
     const dueDateTimeString = `${task.dueDate.split('T')[0]}T${task.dueTime || '00:00:00'}`;
     const dueDate = new Date(dueDateTimeString);
     const now = new Date();
@@ -74,7 +75,7 @@ const TaskItem = ({ task, onDelete, onEdit }) => {
         isUrgent: true, isCompleted: false,
         element: (
           <span className={`${styles.dateTime} ${styles.urgentText}`}>
-            <FaExclamationTriangle /> Son {Math.ceil(hoursRemaining)} saat!
+            <FaExclamationTriangle /> Last {Math.ceil(hoursRemaining)} hour!
           </span>
         ),
       };
@@ -105,10 +106,9 @@ const TaskItem = ({ task, onDelete, onEdit }) => {
   } else if (deadlineInfo.isUrgent) {
     cardClasses.push(styles.borderUrgent); // KIRMIZI
   } else {
-    cardClasses.push(getCategoryBorderClass(task.category)); // KATEGORİ RENGİ
+    cardClasses.push(getCategoryBorderClass(task.category)); 
   }
 
-  // --- İKON TIKLAMALARINI YÖNETME ---
   const handleEdit = (e) => {
     e.stopPropagation(); 
     onEdit(task);

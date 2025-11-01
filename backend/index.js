@@ -1,4 +1,3 @@
-// .env dosyasındaki değişkenleri yükler
 require('dotenv').config(); 
 
 const express = require('express');
@@ -12,21 +11,19 @@ connectDB();
 
 const app = express();
 
-// Middleware'leri (Ara yazılımları) kullan
-app.use(cors()); // CORS'u etkinleştir
-app.use(express.json()); // Gelen istekleri JSON olarak işle
+app.use(cors()); 
+app.use(express.json()); 
 
 // Temel bir test rotası
 app.get('/', (req, res) => {
-  res.send('Backend API çalışıyor...');
+  res.send('Backend API is running...');
 });
 
-// '/api/auth' ile başlayan tüm istekleri 'authRoutes' dosyasına yönlendir
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
 
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Sunucu ${PORT} portunda çalışmaya başladı.`);
+  console.log(`Server started on port ${PORT}.`);
 });
