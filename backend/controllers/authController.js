@@ -13,13 +13,14 @@ const registerUser = asyncHandler(async (req, res) => {
   if (userExists) {
     return res.status(400).json({ message: 'User with this email already exists' });
   }
-  const user = await User.create({ name, email, password });
+  const user = await User.create({ name, email, password});
 
   if (user) {
     res.status(201).json({
       _id: user._id,
       name: user.name,
       email: user.email,
+      role: user.role,
       avatar: user.avatar,
       token: generateToken(user._id, user.name, user.email, user.avatar), 
     });
@@ -38,6 +39,7 @@ const loginUser = asyncHandler(async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
+      role: user.role,
       avatar: user.avatar || 'Bear',
       token: generateToken(user._id, user.name, user.email, user.avatar || 'Bear'), 
     });

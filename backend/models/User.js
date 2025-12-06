@@ -23,6 +23,13 @@ const userSchema = new mongoose.Schema(
       required: false,
       default: 'Bear', 
     },
+    
+    role: {
+      type: String,
+      enum: ['user', 'admin'], // Sadece 'user' veya 'admin' olabilir
+      default: 'user',         // Kayıt olan herkes varsayılan olarak 'user' olur
+      required: true
+    }
   },
   {
     timestamps: true,

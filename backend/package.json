@@ -8,12 +8,11 @@
     "start": "node index.js",
     "dev": "nodemon index.js"
   },
+
   "jest": {
-    "setupFilesAfterEnv": [
-      "./tests/setup.js"
-    ],
-    "testTimeout": 10000
+    "testEnvironment": "node"
   },
+  
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -26,6 +25,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^7.0.0",
     "mongoose": "^8.19.2",
+    "multer": "^2.0.2",
     "nodemailer": "^7.0.10"
   },
   "devDependencies": {

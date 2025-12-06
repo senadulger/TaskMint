@@ -34,4 +34,13 @@ const protect = async (req, res, next) => {
   }
 };
 
-module.exports = { protect };
+const admin = (req, res, next) => {
+  if (req.user && req.user.role === 'admin') {
+    next(); // Kullanıcı admin ise devam et
+  } else {
+    // Admin değilse 401 veya 403 hatası döndür
+    res.status(401).json({ message: 'Not authorized as an admin' });
+  }
+};
+
+module.exports = { protect, admin};

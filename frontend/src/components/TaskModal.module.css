@@ -20,6 +20,31 @@
   width: 100%;
   max-width: 500px;
   position: relative;
+
+  max-height: 95vh;  /* Ekran yüksekliğinin %85'ini geçmesin */
+  overflow-y: auto;  /* İçerik sığmazsa dikey scroll çıksın */
+}
+
+/* Scrollbar Özelleştirme (Webkit tarayıcılar için) */
+.modalContent::-webkit-scrollbar,
+.attachmentList::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modalContent::-webkit-scrollbar-track,
+.attachmentList::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modalContent::-webkit-scrollbar-thumb,
+.attachmentList::-webkit-scrollbar-thumb {
+  background-color: var(--border-color);
+  border-radius: 10px;
+}
+
+.modalContent::-webkit-scrollbar-thumb:hover,
+.attachmentList::-webkit-scrollbar-thumb:hover {
+  background-color: var(--text-secondary);
 }
 
 .closeButton {
@@ -189,4 +214,111 @@
 [data-theme='light'] .dateTimeContainer input[type="date"]::-webkit-calendar-picker-indicator,
 [data-theme='light'] .dateTimeContainer input[type="time"]::-webkit-calendar-picker-indicator {
   color-scheme: light;
+}
+
+.fileInput {
+  width: 100%;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px dashed var(--border-color);
+  padding: 1rem;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.fileInput:hover {
+  border-color: var(--accent);
+}
+
+/* Dosya seçildiğindeki metin rengi için */
+.fileInput::file-selector-button {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  margin-right: 1rem;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+/* Mevcut Dosyalar Listesi */
+.attachmentList {
+  list-style: none;
+  padding: 0;
+  margin-top: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+
+  max-height: 180px; /* Liste en fazla bu kadar uzasın (yaklaşık 3 dosya boyu) */
+  overflow-y: auto;  /* Fazlası için listenin içinde scroll çıksın */
+}
+
+.attachmentItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background-color: var(--bg-primary);
+  border-bottom: 1px solid var(--border-color);
+  gap: 1rem; 
+}
+
+.attachmentItem:last-child {
+  border-bottom: none;
+}
+
+.fileInfo {
+  display: flex;
+  flex-direction: column;
+  /* Kırpma işleminin çalışması için kritik ayar: */
+  flex: 1;      /* Boş alanın tamamını kapla */
+  min-width: 0; /* Flexbox içinde taşmayı engellemek için gerekli */
+}
+
+.fileName {
+  font-weight: 500;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  
+  /* --- EKLENEN KISIM: Uzun yazıları ... yapar --- */
+  white-space: normal;       /* Alt satıra geçmesine izin ver */
+  word-break: break-word;    /* Çok uzun kelime varsa kır */
+  overflow: visible;         /* Gizleme */
+  display: block;
+  line-height: 1.4;
+  
+  position: relative; 
+  cursor: help;
+}
+
+
+.fileActions {
+  display: flex;
+  align-items: center;
+  /* Butonların asla sıkışmamasını sağlar */
+  flex-shrink: 0; 
+}
+
+.fileMeta {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.viewLink {
+  font-size: 0.85rem;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  background-color: rgba(var(--accent-rgb), 0.1);
+  transition: background-color 0.2s;
+}
+
+.viewLink:hover {
+  background-color: rgba(var(--accent-rgb), 0.2);
 }
