@@ -7,7 +7,8 @@ import {
   FaRegCheckCircle,
   FaExclamationTriangle,
   FaCalendarAlt,
-  FaClock
+  FaClock,
+  FaPaperclip
 } from 'react-icons/fa';
 
 // Tarihi "Today", "Tomorrow" veya "November 5" formatına getiren fonksiyon
@@ -87,6 +88,11 @@ const TaskItem = ({ task, onDelete, onEdit, onToggleStatus }) => {
 
   const { isUrgent, isCompleted, urgentMessage } = getDeadlineInfo();
 
+  // Dosya var mı kontrolü
+  const hasFiles = task.attachments && task.attachments.length > 0;
+  // İlk dosyanın linki (Hızlı erişim için)
+  const firstFileUrl = hasFiles ? `http://localhost:5050/${task.attachments[0].filePath}` : '#';
+
   const cardClasses = [
     styles.taskCard,
     isCompleted ? styles.borderCompleted : (isUrgent ? styles.borderUrgent : getCategoryBorderClass(task.category))
@@ -96,6 +102,7 @@ const TaskItem = ({ task, onDelete, onEdit, onToggleStatus }) => {
   const handleEdit = (e) => { e.stopPropagation(); onEdit(task); };
   const handleDelete = (e) => { e.stopPropagation(); onDelete(task._id); };
   const handleToggle = (e) => { e.stopPropagation(); onToggleStatus(task); };
+  
   
   return (
     <div className={cardClasses.join(' ')} onClick={handleEdit}>
@@ -144,12 +151,29 @@ const TaskItem = ({ task, onDelete, onEdit, onToggleStatus }) => {
           <span className={`${styles.categoryTag} ${getCategoryTagClass(task.category)}`}>
             {task.category}
           </span>
-          {/* İSTEK 2: Aciliyet Uyarısı (eğer acilse ve mesaj varsa) */}
+          
+          {/* Dosya İkonu ve Sayısı*/}
+          {hasFiles && (
+             <a 
+               href={firstFileUrl}
+               target="_blank"
+               rel="noopener noreferrer"
+               className={styles.attachmentBadge}
+               onClick={(e) => e.stopPropagation()} // Karta tıklamayı engelle, sadece dosyayı aç
+               title={`${task.attachments.length} file(s) attached`}
+             >
+               <FaPaperclip />
+               <span>{task.attachments.length}</span>
+             </a>
+          )}
+          
+          {/*Aciliyet Uyarısı (eğer acilse ve mesaj varsa) */}
           {isUrgent && (
             <span className={styles.urgentText}>
               <FaExclamationTriangle /> {urgentMessage} {/* Uyarı Metni */}
             </span>
           )}
+          
         </div>
         
         {/* Görev Tamamlama Butonu (Checkbox) */}

@@ -158,3 +158,23 @@
   font-size: 1.5rem;
   color: var(--color-success); 
 }
+.attachmentBadge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background-color: rgba(255, 255, 255, 0.1); /* Hafif şeffaf arka plan */
+  padding: 3px 8px;
+  border-radius: 12px;
+  color: var(--text-secondary, #aaa); /* İkon rengi */
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.attachmentBadge:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border-color: #4ade80; /* Yeşil border (Accent rengin) */
+}
