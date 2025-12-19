@@ -1,68 +1,51 @@
 import React, { useState, useEffect } from 'react';
+import Snowfall from 'react-snowfall';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { FaEye, FaEyeSlash, FaSun, FaMoon, FaUser, FaEnvelope, FaLock } from 'react-icons/fa';
 import styles from './AuthPage.module.css';
 import mintLeafLogo from '../assets/logo.png';
+import authIllustration from '../assets/christmasTree.gif';
+import snowGround from '../assets/snowGround.png';
 
-// Tema Değiştirme
-const AuthThemeToggle = ({ theme, setTheme }) => {
-  return (
-    <button
-      className={styles.themeToggleButton}
-      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-      aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-    >
-      {theme === 'dark' ? <FaMoon className={styles.themeIcon} /> : <FaSun className={styles.themeIcon} />}
-    </button>
-  );
-};
-
-//İkonlar
+// İkonlar
 const IconInput = ({ id, label, type, value, onChange, placeholder, autoComplete, required, icon: Icon, isPassword = false, showPassword, setShowPassword, customStyles }) => {
-    
-    const inputType = isPassword && !showPassword ? 'password' : 'text';
 
-    return (
-        <div className={styles.formGroup}>
-            <label htmlFor={id}>{label}</label>
-            <div className={styles.inputWrapper}>
-                {/* Sol İkon */}
-                <Icon className={styles.inputIconLeft} /> 
-                
-                <input
-                    type={inputType}
-                    id={id}
-                    name={id}
-                    className={`${styles.formInput} ${customStyles}`}
-                    value={value}
-                    onChange={onChange}
-                    placeholder={placeholder}
-                    autoComplete={autoComplete}
-                    required
-                />
-                
-                {/* Sağ Göz İkonu */}
-                {isPassword && (
-                    <span onClick={() => setShowPassword(!showPassword)} className={styles.eyeIcon}>
-                        {showPassword ? <FaEyeSlash /> : <FaEye />}
-                    </span>
-                )}
-            </div>
-        </div>
-    );
+  const inputType = isPassword && !showPassword ? 'password' : 'text';
+
+  return (
+    <div className={styles.formGroup}>
+      <label htmlFor={id}>{label}</label>
+      <div className={styles.inputWrapper}>
+        {/* Sol İkon */}
+        <Icon className={styles.inputIconLeft} />
+
+        <input
+          type={inputType}
+          id={id}
+          name={id}
+          className={`${styles.formInput} ${customStyles}`}
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          autoComplete={autoComplete}
+          required
+        />
+
+        {/* Sağ Göz İkonu */}
+        {isPassword && (
+          <span onClick={() => setShowPassword(!showPassword)} className={styles.eyeIcon}>
+            {showPassword ? <FaEyeSlash /> : <FaEye />}
+          </span>
+        )}
+      </div>
+    </div>
+  );
 };
 
 const AuthPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-
-  // Tema state'ini ve useEffect'i burada tutuyoruz.
-  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
-  }, [theme]);
 
   // URL'e göre mod: /register => true, /login => false
   const isRegister = location.pathname === '/register';
@@ -143,6 +126,21 @@ const AuthPage = () => {
 
   return (
     <div className={styles.authContainer}>
+      <Snowfall
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          zIndex: 1,
+          pointerEvents: 'none'
+        }}
+        snowflakeCount={200}
+        speed={[0.5, 0.8]}
+        wind={[-0.2, 0.2]}
+      />
+      <img src={snowGround} alt="Snowy Ground" className={styles.snowGround} />
       {/* Sol Panel */}
       <div className={styles.leftPanel}>
         <img src={mintLeafLogo} alt="TaskMint Logo" className={styles.brandLogo} />
@@ -150,11 +148,10 @@ const AuthPage = () => {
         <p className={styles.tagline}>The easiest way to achieve your goals.</p>
       </div>
 
+      <img src={authIllustration} alt="Christmas Tree" className={styles.heroImage} />
+
       {/* Sağ Panel (Formlar) */}
       <div className={styles.rightPanel}>
-        <div className={styles.themeToggleContainer}>
-          <AuthThemeToggle theme={theme} setTheme={setTheme} />
-        </div>
 
         <div className={styles.formWrapper}>
           {/* Sekmeler */}
@@ -181,58 +178,58 @@ const AuthPage = () => {
               <>
                 {/* Name Girişi */}
                 <IconInput
-                    id="su-name" label="Name" type="text"
-                    value={suName} onChange={(e) => setSuName(e.target.value)}
-                    placeholder="Enter your name" autoComplete="section-signup name" required
-                    icon={FaUser}
-                    customStyles={styles.inputWithIcon}
+                  id="su-name" label="Name" type="text"
+                  value={suName} onChange={(e) => setSuName(e.target.value)}
+                  placeholder="Enter your name" autoComplete="section-signup name" required
+                  icon={FaUser}
+                  customStyles={styles.inputWithIcon}
                 />
 
                 {/* Email Girişi */}
                 <IconInput
-                    id="su-email" label="Email" type="email"
-                    value={suEmail} onChange={(e) => setSuEmail(e.target.value)}
-                    placeholder="example@email.com" autoComplete="section-signup email" required
-                    icon={FaEnvelope}
-                    customStyles={styles.inputWithIcon}
+                  id="su-email" label="Email" type="email"
+                  value={suEmail} onChange={(e) => setSuEmail(e.target.value)}
+                  placeholder="example@email.com" autoComplete="section-signup email" required
+                  icon={FaEnvelope}
+                  customStyles={styles.inputWithIcon}
                 />
 
                 {/* Password Girişi */}
                 <IconInput
-                    id="su-password" label="Password" type="password"
-                    value={suPassword} onChange={(e) => setSuPassword(e.target.value)}
-                    placeholder="Enter password" autoComplete="section-signup new-password" required
-                    icon={FaLock} isPassword showPassword={showPassword} setShowPassword={setShowPassword}
-                    customStyles={styles.inputWithIcon}
+                  id="su-password" label="Password" type="password"
+                  value={suPassword} onChange={(e) => setSuPassword(e.target.value)}
+                  placeholder="Enter password" autoComplete="section-signup new-password" required
+                  icon={FaLock} isPassword showPassword={showPassword} setShowPassword={setShowPassword}
+                  customStyles={styles.inputWithIcon}
                 />
 
                 {/* Confirm Password Girişi */}
                 <IconInput
-                    id="su-confirm" label="Confirm Password" type="password"
-                    value={suConfirmPassword} onChange={(e) => setSuConfirmPassword(e.target.value)}
-                    placeholder="Confirm password" autoComplete="section-signup new-password" required
-                    icon={FaLock} isPassword showPassword={showPassword} setShowPassword={setShowPassword}
-                    customStyles={styles.inputWithIcon}
+                  id="su-confirm" label="Confirm Password" type="password"
+                  value={suConfirmPassword} onChange={(e) => setSuConfirmPassword(e.target.value)}
+                  placeholder="Confirm password" autoComplete="section-signup new-password" required
+                  icon={FaLock} isPassword showPassword={showPassword} setShowPassword={setShowPassword}
+                  customStyles={styles.inputWithIcon}
                 />
               </>
             ) : (
               <>
                 {/* Email Girişi (Sign In) */}
                 <IconInput
-                    id="si-email" label="Email" type="email"
-                    value={siEmail} onChange={(e) => setSiEmail(e.target.value)}
-                    placeholder="example@email.com" autoComplete="section-signin email" required
-                    icon={FaEnvelope}
-                    customStyles={styles.inputWithIcon}
+                  id="si-email" label="Email" type="email"
+                  value={siEmail} onChange={(e) => setSiEmail(e.target.value)}
+                  placeholder="example@email.com" autoComplete="section-signin email" required
+                  icon={FaEnvelope}
+                  customStyles={styles.inputWithIcon}
                 />
 
                 {/* Password Girişi (Sign In) */}
                 <IconInput
-                    id="si-password" label="Password" type="password"
-                    value={siPassword} onChange={(e) => setSiPassword(e.target.value)}
-                    placeholder="Enter password" autoComplete="section-signin current-password" required
-                    icon={FaLock} isPassword showPassword={showPassword} setShowPassword={setShowPassword}
-                    customStyles={styles.inputWithIcon}
+                  id="si-password" label="Password" type="password"
+                  value={siPassword} onChange={(e) => setSiPassword(e.target.value)}
+                  placeholder="Enter password" autoComplete="section-signin current-password" required
+                  icon={FaLock} isPassword showPassword={showPassword} setShowPassword={setShowPassword}
+                  customStyles={styles.inputWithIcon}
                 />
               </>
             )}

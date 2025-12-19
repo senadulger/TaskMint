@@ -1,8 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const Task = require('../models/Task');
+const Attachment = require('../models/Attachment');
 const mongoose = require('mongoose');
-const fs = require('fs');
-const path = require('path');
 
 // @desc    Kullanıcının görevlerini (Admin ise hepsini) listeleme
 // @route   GET /api/tasks
@@ -11,19 +10,19 @@ const getTasks = asyncHandler(async (req, res) => {
   let tasks;
 
   // --- ADMIN KONTROLÜ ---
-  // Admin ise veritabanındaki TÜM görevleri görebilir.
+  // Admin ise veritabanındaki tüm görevleri görebilir.
   if (req.user.role === 'admin') {
     tasks = await Task.find().populate('user', 'name email').populate('assignedTo', 'name email');
   } else {
-    // Normal kullanıcı ise sadece KENDİ oluşturduğu veya KENDİSİNE ATANAN görevleri görür
+    // Normal kullanıcı ise sadece kendi oluşturduğu veya kendisine atanmış görevleri görür
     tasks = await Task.find({
       $or: [
         { user: req.user._id },       // Oluşturan benim
         { assignedTo: req.user._id }  // Veya bana atanmış
       ]
-    }).populate('assignedTo', 'name');
+    }).populate('assignedTo', 'name').populate('user', 'name');
   }
- 
+
 
   res.json(tasks);
 });
@@ -38,85 +37,152 @@ const createTask = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: 'Please provide title, category, and status' });
   }
 
-  // --- DOSYA İŞLEME  ---
-  // Multer tarafından yüklenen dosyaları şemaya uygun hale getiriyoruz .
-  let attachments = [];
+  // --- VERITABANI DOSYA İŞLEME ---
+  // Önce Task nesnesini oluştur (ID'si olsun diye)
+  const taskId = new mongoose.Types.ObjectId();
+
+  let taskAttachments = [];
+
+  // Dosya varsa Attachment koleksiyonuna kaydet
   if (req.files && req.files.length > 0) {
-    attachments = req.files.map(file => ({
-      fileName: file.originalname,
-      filePath: file.path,
-      fileType: file.mimetype.split('/')[1] || 'unknown',
-      fileSize: file.size,
-      uploader: req.user._id // Dosyayı kim yükledi? 
-    }));
+    for (const file of req.files) {
+      const attachmentId = new mongoose.Types.ObjectId();
+      const storagePath = `http://localhost:5050/api/tasks/attachments/${attachmentId}`;
+
+      const attachment = new Attachment({
+        _id: attachmentId,
+        originalFileName: file.originalname,
+        fileType: file.mimetype.split('/')[1] || 'unknown',
+        fileData: file.buffer, // Binary data
+        fileSize: file.size,
+        uploaderUserId: req.user._id,
+        taskId: taskId,
+        storagePath: storagePath
+      });
+
+      const savedAttachment = await attachment.save();
+
+      // Task içine eklenecek metadata
+      taskAttachments.push({
+        attachmentId: savedAttachment._id,
+        originalFileName: savedAttachment.originalFileName,
+        storagePath: savedAttachment.storagePath,
+        fileType: savedAttachment.fileType,
+        fileSize: savedAttachment.fileSize,
+        uploaderUserId: savedAttachment.uploaderUserId
+      });
+    }
   }
 
-  const task = new Task({
-    user: req.user._id,
-    title,
-    description,
-    category,
-    status,
-    dueDate,
-    dueTime,
-    attachments, // Dosyaları ekle
-    // Admin ise başkasına görev atayabilir, değilse bu alan null kalır
-    assignedTo: req.user.role === 'admin' && assignedTo ? assignedTo : null 
-  });
+  let finalAssignedTo = null;
+  // Sadece admin ise assignedTo kullanabilir. Ayrıca boş string veya "null" string gelirse null yapalım.
+  if (req.user.role === 'admin' && assignedTo && assignedTo !== 'null' && assignedTo !== 'undefined' && assignedTo !== '') {
+    finalAssignedTo = assignedTo;
+  }
 
-  const createdTask = await task.save();
-  res.status(201).json(createdTask);
+  try {
+    const task = new Task({
+      _id: taskId,
+      user: req.user._id,
+      title,
+      description,
+      category,
+      status,
+      dueDate,
+      dueTime,
+      attachments: taskAttachments,
+      assignedTo: finalAssignedTo
+    });
+
+    const createdTask = await task.save();
+    console.log('Task created successfully with ID:', createdTask._id);
+    res.status(201).json(createdTask);
+
+  } catch (error) {
+    console.error('Create Task Error (Details):', error);
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ message: error.message, error: error.errors });
+    }
+    res.status(500).json({ message: 'Server Error during task creation', error: error.message });
+  }
 });
 
 // @desc    Görev güncelleme (+ Dosya Ekleme)
 // @route   PUT /api/tasks/:id
 // @access  Private
 const updateTask = asyncHandler(async (req, res) => {
+  console.log('updateTask called');
+  console.log('body:', req.body);
+  console.log('files:', req.files);
   const task = await Task.findById(req.params.id);
 
-  if (!task) {
-    return res.status(404).json({ message: 'Task not found' });
+  try {
+    if (!task) {
+      return res.status(404).json({ message: 'Task not found' });
+    }
+
+    // --- YETKİ KONTROLÜ ---
+    const isOwner = task.user.toString() === req.user._id.toString();
+    const isAdmin = req.user.role === 'admin';
+    const isAssigned = task.assignedTo && task.assignedTo.toString() === req.user._id.toString();
+
+    if (!isOwner && !isAdmin && !isAssigned) {
+      return res.status(401).json({ message: 'Not authorized to update this task' });
+    }
+
+    // --- YENİ DOSYALARI EKLEME ---
+    if (req.files && req.files.length > 0) {
+      const newAttachments = [];
+      for (const file of req.files) {
+        const attachmentId = new mongoose.Types.ObjectId();
+        const storagePath = `http://localhost:5050/api/tasks/attachments/${attachmentId}`;
+
+        const attachment = new Attachment({
+          _id: attachmentId,
+          originalFileName: file.originalname,
+          fileType: file.mimetype.split('/')[1] || 'unknown',
+          fileData: file.buffer,
+          fileSize: file.size,
+          uploaderUserId: req.user._id,
+          taskId: task._id,
+          storagePath: storagePath
+        });
+        const saved = await attachment.save();
+        newAttachments.push({
+          attachmentId: saved._id,
+          originalFileName: saved.originalFileName,
+          storagePath: saved.storagePath,
+          fileType: saved.fileType,
+          fileSize: saved.fileSize,
+          uploaderUserId: saved.uploaderUserId
+        });
+      }
+      task.attachments.push(...newAttachments);
+    }
+
+    task.title = req.body.title || task.title;
+    task.description = req.body.description || task.description;
+    task.category = req.body.category || task.category;
+    task.status = req.body.status || task.status;
+    task.dueDate = req.body.dueDate || task.dueDate;
+    task.dueTime = req.body.dueTime || task.dueTime;
+
+    // Admin ise atamayı değiştirebilir
+    if (isAdmin) {
+      // Eğer assignedTo boş string ise atamayı kaldır
+      if (req.body.assignedTo === "") {
+        task.assignedTo = null;
+      } else if (req.body.assignedTo) {
+        task.assignedTo = req.body.assignedTo;
+      }
+    }
+
+    const updatedTask = await task.save();
+    res.json(updatedTask);
+  } catch (error) {
+    console.error('Update Task Error:', error);
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
-
-  // --- YETKİ KONTROLÜ ---
-  // Sadece Admin veya görevin sahibi güncelleyebilir
-  // Ayrıca görev sana atandıysa (assignedTo) durumunu güncelleyebilmelisin
-  const isOwner = task.user.toString() === req.user._id.toString();
-  const isAdmin = req.user.role === 'admin';
-  const isAssigned = task.assignedTo && task.assignedTo.toString() === req.user._id.toString();
-
-  if (!isOwner && !isAdmin && !isAssigned) {
-    return res.status(401).json({ message: 'Not authorized to update this task' });
-  }
-
-  // --- YENİ DOSYALARI EKLEME ---
-  // Mevcut dosyalara dokunmadan yenileri ekliyoruz (push)
-  if (req.files && req.files.length > 0) {
-    const newAttachments = req.files.map(file => ({
-      fileName: file.originalname,
-      filePath: file.path,
-      fileType: file.mimetype.split('/')[1] || 'unknown',
-      fileSize: file.size,
-      uploader: req.user._id
-    }));
-    // Veritabanındaki attachments dizisine yenileri ekle
-    task.attachments.push(...newAttachments);
-  }
-
-  task.title = req.body.title || task.title;
-  task.description = req.body.description || task.description;
-  task.category = req.body.category || task.category;
-  task.status = req.body.status || task.status;
-  task.dueDate = req.body.dueDate || task.dueDate;
-  task.dueTime = req.body.dueTime || task.dueTime;
-  
-  // Admin ise atamayı değiştirebilir
-  if (isAdmin && req.body.assignedTo) {
-      task.assignedTo = req.body.assignedTo;
-  }
-
-  const updatedTask = await task.save();
-  res.json(updatedTask);
 });
 
 // @desc    Görev silme
@@ -130,15 +196,20 @@ const deleteTask = asyncHandler(async (req, res) => {
   }
 
   // --- YETKİ KONTROLÜ ---
-  // Admin herkesin görevini silebilir, kullanıcı sadece kendisininkini.
-  if (task.user.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+  // Admin herkesin görevini silebilir, kullanıcı sadece kendisininkini veya kendisine atananı.
+  const isOwner = task.user.toString() === req.user._id.toString();
+  const isAdmin = req.user.role === 'admin';
+  const isAssigned = task.assignedTo && task.assignedTo.toString() === req.user._id.toString();
+
+  if (!isOwner && !isAdmin && !isAssigned) {
     return res.status(401).json({ message: 'Not authorized to delete this task' });
   }
 
-  // Not: Dosyaları diskten silme işlemi (fs.unlink) buraya eklenebilir, 
-  // ancak şimdilik veritabanından silmek yeterli olacaktır.
+  // --- DOSYALARI SİLME ---
+  await Attachment.deleteMany({ taskId: req.params.id });
+
   await task.deleteOne();
-  res.json({ message: 'Task successfully deleted' });
+  res.json({ message: 'Task and attachments successfully deleted' });
 });
 
 // @desc    İstatistikleri getirme
@@ -146,10 +217,15 @@ const deleteTask = asyncHandler(async (req, res) => {
 // @access  Private
 const getTaskStats = asyncHandler(async (req, res) => {
   // Admin ise tüm sistemin istatistikleri, değilse sadece kendi istatistikleri
-  let matchQuery = { user: new mongoose.Types.ObjectId(req.user._id) };
-  
+  let matchQuery = {
+    $or: [
+      { user: new mongoose.Types.ObjectId(req.user._id) },
+      { assignedTo: new mongoose.Types.ObjectId(req.user._id) }
+    ]
+  };
+
   if (req.user.role === 'admin') {
-      matchQuery = {}; // Filtre yok, hepsini al
+    matchQuery = {}; // Filtre yok, hepsini al
   }
 
   const stats = await Task.aggregate([
@@ -203,32 +279,57 @@ const deleteAttachment = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: 'Task not found' });
   }
 
-  // Yetki Kontrolü: Sadece sahibi veya Admin silebilir
-  if (task.user.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+  // Yetki Kontrolü: Sadece sahibi, Admin veya atanan kişi silebilir
+  const isOwner = task.user.toString() === req.user._id.toString();
+  const isAdmin = req.user.role === 'admin';
+  const isAssigned = task.assignedTo && task.assignedTo.toString() === req.user._id.toString();
+
+  if (!isOwner && !isAdmin && !isAssigned) {
     return res.status(401).json({ message: 'Not authorized' });
   }
 
-  // Silinecek dosyayı bul
-  const attachment = task.attachments.id(req.params.attachmentId);
-  if (!attachment) {
-    return res.status(404).json({ message: 'Attachment not found' });
+  const attachmentSubdoc = task.attachments.id(req.params.attachmentId);
+  const realAttachmentId = attachmentSubdoc ? attachmentSubdoc.attachmentId : null;
+
+  if (!attachmentSubdoc) {
+    return res.status(404).json({ message: 'Attachment info not found in task' });
   }
 
-  // 1. Dosyayı fiziksel olarak diskten (uploads klasöründen) sil
-  // Not: 'fs' modülünün import edildiğinden emin ol (const fs = require('fs');)
-  if (attachment.filePath) {
-    const absolutePath = path.join(__dirname, '..', attachment.filePath); 
-    // filePath 'uploads\dosya.pdf' gibi geldiği için path'i düzeltiyoruz
-    if (fs.existsSync(absolutePath)) {
-      fs.unlinkSync(absolutePath);
-    }
+
+  // Veritabanından (Attachment collection) sil
+  if (realAttachmentId) {
+    await Attachment.findByIdAndDelete(realAttachmentId);
   }
 
-  // 2. Dosyayı veritabanı dizisinden çıkar
+  // Dosyayı veritabanı dizisinden (Task) çıkar
   task.attachments.pull(req.params.attachmentId);
   await task.save();
 
   res.json({ message: 'File removed' });
+});
+
+// @desc    Dosyayı indir/görüntüle (Database'den)
+// @route   GET /api/tasks/attachments/:id
+// @access  Private (veya Public, ihtiyaca göre. Şuan Private yapalım)
+const getAttachment = asyncHandler(async (req, res) => {
+  const attachment = await Attachment.findById(req.params.id);
+
+  if (!attachment) {
+    return res.status(404).json({ message: 'Attachment not found' });
+  }
+
+  // MimeType belirleme
+  let contentType = 'application/octet-stream';
+  if (attachment.fileType === 'png') contentType = 'image/png';
+  else if (attachment.fileType === 'jpg' || attachment.fileType === 'jpeg') contentType = 'image/jpeg';
+  else if (attachment.fileType === 'pdf') contentType = 'application/pdf';
+  else if (attachment.fileType === 'txt') contentType = 'text/plain';
+
+  res.set('Content-Type', contentType);
+  const filename = attachment.originalFileName || 'downloaded-file';
+  res.set('Content-Disposition', `inline; filename="${encodeURIComponent(filename)}"`);
+
+  res.send(attachment.fileData);
 });
 
 module.exports = {
@@ -237,5 +338,6 @@ module.exports = {
   updateTask,
   deleteTask,
   getTaskStats,
-  deleteAttachment
+  deleteAttachment,
+  getAttachment
 };

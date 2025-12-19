@@ -14,16 +14,44 @@
 }
 
 .pageError {
-  color: var(--color-warning); 
-  background-color: rgba(239, 68, 68, 0.1); 
+  color: var(--color-warning);
+  background-color: rgba(239, 68, 68, 0.1);
   padding: 0.5rem 1rem;
   border-radius: 6px;
 }
 
 /* "Create New Task" butonu */
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.searchInput {
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  width: 250px;
+  transition: all 0.2s ease;
+}
+
+.searchInput::placeholder {
+  color: var(--text-placeholder);
+  opacity: 0.8;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.2);
+}
+
 .addButton {
   background-color: var(--accent);
-  color: var(--accent-text); 
+  color: var(--accent-text);
   border: none;
   border-radius: 12px;
   padding: 0.75rem 1.25rem;
@@ -36,8 +64,9 @@
   height: fit-content;
   transition: background-color 0.2s;
 }
+
 .addButton:hover {
-  background-color: var(--accent-hover); 
+  background-color: var(--accent-hover);
 }
 
 /* Filtre (Status, Category) dropdown'larını içeren ana sarmalayıcı */
@@ -63,15 +92,15 @@
 
 .filterWrapper label {
   font-size: 0.9rem;
-  color: var(--text-secondary); 
+  color: var(--text-secondary);
   font-weight: 500;
   padding-left: 0.25rem;
 }
 
 .filterSelect {
-  background-color: var(--bg-secondary); 
-  color: var(--text-primary); 
-  border: 1px solid var(--border-color); 
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
   padding: 0.6rem 1.1rem;
   border-radius: 12px;
   font-size: 0.9rem;
@@ -82,46 +111,66 @@
 }
 
 .filterSelect:hover {
-  background-color: var(--bg-tertiary); 
-  border-color: var(--accent); 
+  background-color: var(--bg-tertiary);
+  border-color: var(--accent);
 }
 
 .filterSelect:focus {
   outline: none;
-  border-color: var(--accent); 
+  border-color: var(--accent);
 }
 
 .filterSelect option {
-  background-color: var(--bg-secondary); 
-  color: var(--text-primary); 
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
 /* Kategori Filtresi Renklendirmesi */
 .filterSelect[data-category="All"] {
-  background-color: var(--bg-secondary); 
-  color: var(--text-primary); 
-  border-color: var(--border-color); 
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border-color: var(--border-color);
 }
 
 .filterSelect[data-category="Job"] {
-  background-color: var(--cat-job); 
-  border-color: var(--cat-job); 
-  color: var(--accent-text); 
+  background-color: var(--cat-job);
+  border-color: var(--cat-job);
+  color: var(--accent-text);
 }
+
 .filterSelect[data-category="Personal"] {
-  background-color: var(--cat-personal); 
-  border-color: var(--cat-personal); 
-  color: var(--accent-text); 
+  background-color: var(--cat-personal);
+  border-color: var(--cat-personal);
+  color: var(--accent-text);
 }
+
 .filterSelect[data-category="Hobby"] {
-  background-color: var(--cat-hobby); 
-  border-color: var(--cat-hobby); 
-  color: var(--accent-text); 
+  background-color: var(--cat-hobby);
+  border-color: var(--cat-hobby);
+  color: var(--accent-text);
 }
+
 .filterSelect[data-category="Other"] {
-  background-color: var(--cat-other); 
-  border-color: var(--cat-other); 
-  color: var(--accent-text); 
+  background-color: var(--cat-other);
+  border-color: var(--cat-other);
+  color: var(--accent-text);
+}
+
+.filterSelect[data-category="User"] {
+  color: var(--accent-text);
+}
+
+/* Status Filter Coloring */
+.filterSelect[data-status="Completed"] {
+  background-color: var(--color-success);
+  border-color: var(--color-success);
+  color: #fff;
+}
+
+.filterSelect[data-status="Incomplete"] {
+  background-color: var(--cat-hobby);
+  border-color: var(--cat-hobby);
+  color: var(--accent-text);
 }
 
 /* Görev Listesi*/

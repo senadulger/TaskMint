@@ -4,15 +4,15 @@ const mongoose = require('mongoose');
 const taskSchema = new mongoose.Schema(
   {
     user: {
-      type: mongoose.Schema.Types.ObjectId, 
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
-      ref: 'User', 
+      ref: 'User',
     },
 
     assignedTo: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      default: null 
+      default: null
     },
 
     title: {
@@ -34,7 +34,7 @@ const taskSchema = new mongoose.Schema(
       type: String,
       required: true,
       enum: ['Incomplete', 'In Progress', 'Completed'],
-      default: 'Incomplete', 
+      default: 'Incomplete',
     },
 
     dueDate: {
@@ -50,17 +50,22 @@ const taskSchema = new mongoose.Schema(
     // Attachment Module
     attachments: [
       {
-        fileName: { type: String, required: true }, 
-        filePath: { type: String, required: true }, 
+        attachmentId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Attachment',
+          required: true
+        },
+        originalFileName: { type: String, required: true },
+        storagePath: { type: String, required: true },
         fileType: { type: String },                 // pdf, jpg vb. 
         fileSize: { type: Number },                 // Dosya boyutu 
-        uploader: {                                 // Dosyayı yükleyen kullanıcı 
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User'
+        uploaderUserId: {                           // Dosyayı yükleyen kullanıcı 
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'User'
         },
         uploadDate: {                               // Yükleme tarihi 
-            type: Date,
-            default: Date.now
+          type: Date,
+          default: Date.now
         }
       }
     ]

@@ -1,7 +1,7 @@
 /* Ana Kart Yapısı */
 .taskCard {
-  background-color: var(--bg-secondary); 
-  border-radius: 12px; 
+  background-color: var(--bg-secondary);
+  border-radius: 12px;
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
@@ -9,10 +9,10 @@
   justify-content: space-between;
   cursor: pointer;
   transition: all 0.2s ease;
-  
-  border: 1px solid var(--border-color); 
-  border-left-width: 6px; 
-  border-left-color: var(--border-color); 
+
+  border: 1px solid var(--border-color);
+  border-left-width: 6px;
+  border-left-color: var(--border-color);
 }
 
 .taskCard:hover {
@@ -21,29 +21,57 @@
 }
 
 /* Dinamik Kenarlık Renkleri (Kategoriye Göre)*/
-.borderJob { border-left-color: var(--cat-job); }
-.borderPersonal { border-left-color: var(--cat-personal); }
-.borderHobby { border-left-color: var(--cat-hobby); }
-.borderOther { border-left-color: var(--cat-other); }
+.borderJob {
+  border-left-color: var(--cat-job);
+}
 
-.borderJob:hover { border-color: var(--cat-job); }
-.borderPersonal:hover { border-color: var(--cat-personal); }
-.borderHobby:hover { border-color: var(--cat-hobby); }
-.borderOther:hover { border-color: var(--cat-other); }
+.borderPersonal {
+  border-left-color: var(--cat-personal);
+}
 
-.borderUrgent { 
-  border-left-color: var(--color-warning); 
+.borderHobby {
+  border-left-color: var(--cat-hobby);
+}
+
+.borderOther {
+  border-left-color: var(--cat-other);
+}
+
+.borderJob:hover {
+  border-color: var(--cat-job);
+}
+
+.borderPersonal:hover {
+  border-color: var(--cat-personal);
+}
+
+.borderHobby:hover {
+  border-color: var(--cat-hobby);
+}
+
+.borderOther:hover {
+  border-color: var(--cat-other);
+}
+
+.borderUrgent {
+  border-left-color: var(--color-warning);
   border-color: var(--color-warning);
-  background-color: rgba(239, 68, 68, 0.1); 
+  background-color: rgba(239, 68, 68, 0.1);
 }
-.borderUrgent:hover { border-color: var(--color-warning); } 
 
-.borderCompleted { 
-  border-left-color: var(--color-success); 
-  border-color: var(--color-success); 
-  background-color: rgba(61, 204, 145, 0.1); 
+.borderUrgent:hover {
+  border-color: var(--color-warning);
 }
-.borderCompleted:hover { border-color: var(--color-success); } 
+
+.borderCompleted {
+  border-left-color: var(--color-success);
+  border-color: var(--color-success);
+  background-color: rgba(61, 204, 145, 0.1);
+}
+
+.borderCompleted:hover {
+  border-color: var(--color-success);
+}
 
 /* Kart Bölümleri (Header, Middle, Footer)*/
 .cardHeader {
@@ -52,27 +80,36 @@
   align-items: flex-start;
   gap: 0.5rem;
 }
+
 .cardHeader h3 {
-  color: var(--text-primary); 
+  color: var(--text-primary);
   font-size: 1.15rem;
   font-weight: 600;
   line-height: 1.4;
   flex-grow: 1;
 }
+
 .actions {
   display: flex;
   gap: 0.75rem;
   flex-shrink: 0;
 }
+
 .iconButton {
   background: none;
   border: none;
-  color: var(--text-secondary); 
+  color: var(--text-secondary);
   cursor: pointer;
   font-size: 0.9rem;
 }
-.iconButton:hover { color: var(--text-primary); } 
-.deleteButton:hover { color: var(--color-warning); } 
+
+.iconButton:hover {
+  color: var(--text-primary);
+}
+
+.deleteButton:hover {
+  color: var(--color-warning);
+}
 
 .cardMiddle {
   margin: 1rem 0;
@@ -84,9 +121,9 @@
 
 .description {
   font-size: 0.9rem;
-  color: var(--text-secondary); 
+  color: var(--text-secondary);
   line-height: 1.5;
-  
+
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
@@ -98,11 +135,12 @@
   display: flex;
   gap: 1rem;
 }
+
 .dateTime {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: var(--text-secondary); 
+  color: var(--text-secondary);
   font-size: 0.9rem;
 }
 
@@ -125,13 +163,24 @@
   padding: 0.25rem 0.75rem;
   border-radius: 12px;
   display: inline-block;
-  color: #FFFFFF; 
+  color: #FFFFFF;
 }
 
-.tagJob { background-color: var(--cat-job); }
-.tagPersonal { background-color: var(--cat-personal); }
-.tagHobby { background-color: var(--cat-hobby); }
-.tagOther { background-color: var(--cat-other); }
+.tagJob {
+  background-color: var(--cat-job);
+}
+
+.tagPersonal {
+  background-color: var(--cat-personal);
+}
+
+.tagHobby {
+  background-color: var(--cat-hobby);
+}
+
+.tagOther {
+  background-color: var(--cat-other);
+}
 
 .urgentText {
   color: var(--color-warning);
@@ -150,22 +199,25 @@
   margin: -0.5rem;
   border-radius: 50%;
 }
+
 .checkPending {
   font-size: 1.5rem;
-  color: var(--border-color); 
+  color: var(--border-color);
 }
+
 .checkCompleted {
   font-size: 1.5rem;
-  color: var(--color-success); 
+  color: var(--color-success);
 }
+
 .attachmentBadge {
   display: flex;
   align-items: center;
   gap: 4px;
-  background-color: rgba(255, 255, 255, 0.1); /* Hafif şeffaf arka plan */
+  background-color: rgba(255, 255, 255, 0.1);
   padding: 3px 8px;
   border-radius: 12px;
-  color: var(--text-secondary, #aaa); /* İkon rengi */
+  color: var(--text-secondary, #aaa);
   font-size: 0.8rem;
   font-weight: 600;
   text-decoration: none;
@@ -176,5 +228,5 @@
 .attachmentBadge:hover {
   background-color: rgba(255, 255, 255, 0.2);
   color: #fff;
-  border-color: #4ade80; /* Yeşil border (Accent rengin) */
+  border-color: #4ade80;
 }

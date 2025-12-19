@@ -1,20 +1,10 @@
 const multer = require('multer');
 const path = require('path');
 
-// 1. Dosyanın Nereye ve Hangi İsimle Kaydedileceği
-const storage = multer.diskStorage({
-  destination(req, file, cb) {
-    // Dosyalar ana dizindeki 'uploads' klasörüne kaydedilecek
-    cb(null, path.join(__dirname, '../uploads/'));
-  },
-  filename(req, file, cb) {
-    // Çakışmayı önlemek için ismin başına tarih ekliyoruz
-    // Örn: 173123456-rapor.pdf
-    cb(null, `${Date.now()}-${file.originalname}`);
-  },
-});
+// Dosyayı Hafızada Tutma (Database'e kaydetmek için)
+const storage = multer.memoryStorage();
 
-// 2. Dosya Formatı Kontrolü (Gereksinim 8.1)
+// Dosya Formatı Kontrolü (Gereksinim 8.1)
 // Supported: PDF, PNG, JPG, DOCX, XLSX
 const checkFileType = (file, cb) => {
   const filetypes = /jpg|jpeg|png|pdf|doc|docx|xls|xlsx/;
@@ -30,7 +20,7 @@ const checkFileType = (file, cb) => {
   }
 };
 
-// 3. Multer Ayarlarını Birleştirme
+// Multer Ayarlarını Birleştirme
 const upload = multer({
   storage,
   limits: { fileSize: 10 * 1024 * 1024 }, // Max 10 MB limit 

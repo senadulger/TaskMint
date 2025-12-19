@@ -9,9 +9,10 @@ const {
   deleteTask,
   getTaskStats,
   deleteAttachment,
+  getAttachment
 } = require('../controllers/taskController');
 
-const { protect } = require('../middleware/authMiddleware'); 
+const { protect } = require('../middleware/authMiddleware');
 
 // GET /api/tasks (Tüm görevleri listele)
 // POST /api/tasks (Yeni görev ekle)
@@ -21,6 +22,9 @@ router.route('/')
 
 // GET /api/tasks/stats (İstatistikleri al)
 router.route('/stats').get(protect, getTaskStats);
+
+// Veritabanından dosya çekme route'u
+router.get('/attachments/:id', getAttachment);
 
 // PUT /api/tasks/:id (Görevi güncelle)
 // DELETE /api/tasks/:id (Görevi sil)

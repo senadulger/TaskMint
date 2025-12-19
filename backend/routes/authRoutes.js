@@ -6,7 +6,7 @@ const {
   loginUser,
   getUserProfile,
   updateUserProfile,
-  updateUserPassword, 
+  updateUserPassword,
   getAllUsers,
   forgotPassword,
 } = require('../controllers/authController');
@@ -26,5 +26,6 @@ router.put('/password', protect, updateUserPassword);
 
 // Sadece Adminler tüm kullanıcıları görebilir
 router.get('/users', protect, admin, getAllUsers);
+router.delete('/users/:id', protect, admin, require('../controllers/authController').deleteUser);
 
 module.exports = router;

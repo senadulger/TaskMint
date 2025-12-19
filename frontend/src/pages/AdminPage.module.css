@@ -1,0 +1,60 @@
+.container {
+  padding: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  color: var(--text-color);
+}
+
+.userTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 2rem;
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.userTable th,
+.userTable td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.userTable th {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.userTable tr:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.deleteButton {
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.deleteButton:hover {
+  background-color: #dc2626;
+}
+
+.deleteButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.adminRole {
+  font-weight: bold;
+  color: #f59e0b;
+}
+
+.userRole {
+  color: #10b981;
+}

@@ -3,38 +3,38 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: calc(100vh - 70px); 
+    min-height: calc(100vh - 70px);
     font-size: 1.2rem;
     color: var(--text-primary);
 }
 
 .profileContainer {
-    max-width: 1000px; 
-    margin: 0 auto; 
-    padding: 0 20px; 
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 20px;
     color: var(--text-primary);
     display: flex;
     flex-direction: column;
-    gap: 2rem; 
+    gap: 2rem;
 }
 
 /* Başlık ve Genel Bölümler */
 .pageHeader {
-    background-color: var(--bg-secondary); 
+    background-color: var(--bg-secondary);
     padding: 2rem;
     border-radius: 16px;
     display: flex;
     flex-direction: column;
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 1.5rem;
-    margin-bottom: 1rem; 
+    margin-bottom: 1rem;
 }
 
 .pageTitle {
     font-size: 2.2rem;
     font-weight: 700;
     color: var(--text-primary);
-    margin: 0 0 0.75rem 0; 
+    margin: 0 0 0.75rem 0;
 }
 
 .pageSubtitle {
@@ -44,7 +44,7 @@
 }
 
 .formSection {
-    background-color: var(--bg-secondary); 
+    background-color: var(--bg-secondary);
     padding: 2rem;
     border: 1px solid var(--border-color);
     display: flex;
@@ -57,7 +57,7 @@
     font-size: 1.5rem;
     font-weight: 600;
     color: var(--text-primary);
-    margin: 0 0 0.5rem 0; 
+    margin: 0 0 0.5rem 0;
 }
 
 .sectionSubtitle {
@@ -76,60 +76,116 @@
 
 /* Avatar Seçimi */
 .avatarList {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-    padding-top: 0.5rem;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-top: 2.5rem;
+}
+
+@media (min-width: 640px) {
+    .avatarList {
+        grid-template-columns: repeat(4, 1fr);
+    }
 }
 
 .avatarItem {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 1rem;
+    padding: 3rem 1rem 0.75rem 1rem;
+    overflow: visible;
     cursor: pointer;
-    padding: 0.75rem;
-    border-radius: 12px;
-    border: 2px solid transparent;
-    transition: all 0.2s ease;
-    background-color: var(--bg-tertiary);
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .avatarItem:hover {
     transform: translateY(-2px);
 }
 
-.avatarItem.avatarSelected {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 4px rgba(var(--accent-rgb), 0.3); 
+.avatarImageContainer {
+    position: absolute;
+    top: -1.75rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+
+    background-color: #13291F;
+    border: 2px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transition: top 0.2s ease, border-color 0.2s ease;
+}
+
+.avatarItem:hover .avatarImageContainer {
+    top: -2rem;
 }
 
 .avatarImage {
-    width: 50px; 
-    height: 50px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: 0.5rem;
-    border: 2px solid var(--border-color);
-}
-
-.avatarItem.avatarSelected .avatarImage {
-    border-color: var(--accent);
+    width: 4.25rem;
+    height: 4.25rem;
+    object-fit: contain;
+    pointer-events: none;
 }
 
 .avatarItem span {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    font-weight: 500;
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background-color: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.75);
+    transition: all 0.2s ease;
+}
+
+.avatarItem.avatarSelected {
+    border-color: #A3C266;
+    box-shadow: 0 0 0 2px rgba(163, 194, 102, 0.2);
+}
+
+.avatarItem.avatarSelected .avatarImageContainer {
+    border-color: #A3C266;
 }
 
 .avatarItem.avatarSelected span {
-    color: var(--text-primary);
-    font-weight: 600;
+    border-color: #A3C266;
+    color: #A3C266;
+    background-color: rgba(255, 255, 255, 0.06);
+}
+
+.checkIcon {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    padding: 0.25rem;
+    border-radius: 50%;
+    background-color: #A3C266;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+}
+
+.checkIcon svg {
+    width: 14px;
+    height: 14px;
+    stroke: #0F241A;
+    stroke-width: 3;
 }
 
 /* Form Elemanları */
 .formGroup {
-    margin-bottom: 0.5rem; 
+    margin-bottom: 0.5rem;
 }
 
 .formLabel {
@@ -169,16 +225,16 @@
 
 .passwordGrid {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr; 
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 1.5rem;
 }
 
 /* Butonlar ve Mesajlar */
 .buttonContainer {
     display: flex;
-    justify-content: flex-end; 
+    justify-content: flex-end;
     margin-top: 1rem;
-    border-top: 1px solid var(--border-color); 
+    border-top: 1px solid var(--border-color);
     padding-top: 1.5rem;
 }
 
@@ -187,7 +243,7 @@
     color: var(--accent-text);
     border: none;
     border-radius: 12px;
-    padding: 0.9rem 1.75rem; 
+    padding: 0.9rem 1.75rem;
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
@@ -211,7 +267,8 @@
 }
 
 /* Mesaj Stilleri */
-.messageError, .messageSuccess {
+.messageError,
+.messageSuccess {
     font-size: 0.95rem;
     margin-top: 0.5rem;
     text-align: center;
@@ -219,11 +276,13 @@
     border-radius: 12px;
     border: 1px solid transparent;
 }
+
 .messageError {
     color: var(--color-warning);
     background-color: rgba(239, 68, 68, 0.1);
     border-color: var(--color-warning);
 }
+
 .messageSuccess {
     color: var(--color-success);
     background-color: rgba(61, 204, 145, 0.1);
@@ -233,54 +292,61 @@
 
 /* Responsive Ayarlar */
 @media (max-width: 1050px) {
-  .passwordGrid {
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-  }
-  .passwordGrid > .formGroup:nth-child(3) {
-    grid-column: 1 / -1; 
-  }
+    .passwordGrid {
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+
+    .passwordGrid>.formGroup:nth-child(3) {
+        grid-column: 1 / -1;
+    }
 }
 
 @media (max-width: 768px) {
-  .profileContainer {
-    max-width: 100%;
-    padding: 0 15px; 
-  }
-  
-  .passwordGrid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-  .passwordGrid > .formGroup:nth-child(3) {
-    grid-column: auto; 
-  }
-  
-  .pageTitle {
-    font-size: 1.8rem;
-  }
-  .formSection {
-    padding: 1.5rem;
-  }
-  .avatarImage {
-    width: 60px;
-    height: 60px;
-  }
+    .profileContainer {
+        max-width: 100%;
+        padding: 0 15px;
+    }
+
+    .passwordGrid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .passwordGrid>.formGroup:nth-child(3) {
+        grid-column: auto;
+    }
+
+    .pageTitle {
+        font-size: 1.8rem;
+    }
+
+    .formSection {
+        padding: 1.5rem;
+    }
+
+    .avatarImage {
+        width: 60px;
+        height: 60px;
+    }
 }
 
 @media (max-width: 480px) {
-  .avatarList {
-    gap: 0.8rem;
-  }
-  .avatarImage {
-    width: 50px;
-    height: 50px;
-  }
-  .avatarItem span {
-    font-size: 0.75rem;
-  }
-  .saveButton {
-    width: 100%;
-    align-self: stretch;
-  }
+    .avatarList {
+        gap: 0.8rem;
+    }
+
+    .avatarImage {
+        width: 50px;
+        height: 50px;
+    }
+
+    .avatarItem span {
+        font-size: 0.75rem;
+    }
+
+    .saveButton {
+        width: 100%;
+        align-self: stretch;
+    }
 }

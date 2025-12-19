@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from './TaskItem.module.css';
+import { jwtDecode } from 'jwt-decode';
 import {
   FaEdit,
   FaTrash,
@@ -14,13 +15,13 @@ import {
 // Tarihi "Today", "Tomorrow" veya "November 5" formatına getiren fonksiyon
 const formatDisplayDate = (dateString) => {
   if (!dateString) return null;
-  const date = new Date(dateString); 
-  
+  const date = new Date(dateString);
+
   if (isNaN(date.getTime())) {
     console.error("Invalid date value received:", dateString);
     return "Invalid Date";
   }
-  
+
   const today = new Date();
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
@@ -31,12 +32,12 @@ const formatDisplayDate = (dateString) => {
 
   if (date.getTime() === today.getTime()) return 'Today';
   if (date.getTime() === tomorrow.getTime()) return 'Tomorrow';
-  return date.toLocaleDateString('en-US', { day: 'numeric', month: 'long' }); 
+  return date.toLocaleDateString('en-US', { day: 'numeric', month: 'long' });
 };
 
 
 const TaskItem = ({ task, onDelete, onEdit, onToggleStatus }) => {
-  
+
   const getCategoryBorderClass = (category) => {
     switch (category.toLowerCase()) {
       case 'job': return styles.borderJob;
@@ -60,12 +61,12 @@ const TaskItem = ({ task, onDelete, onEdit, onToggleStatus }) => {
   const getDeadlineInfo = () => {
     let isUrgent = false;
     let isCompleted = task.status === 'Completed';
-    let urgentMessage = null; 
+    let urgentMessage = null;
 
     if (isCompleted || !task.dueDate) {
       return { isUrgent, isCompleted, urgentMessage };
     }
-    
+
     // Son teslim tarihini ve saatini birleştirerek Date objesi oluştur
     const dueDateTimeString = `${task.dueDate.split('T')[0]}T${task.dueTime || '00:00:00'}`;
     const dueDate = new Date(dueDateTimeString);
@@ -77,10 +78,10 @@ const TaskItem = ({ task, onDelete, onEdit, onToggleStatus }) => {
     // Vade geçmiş veya son 24 saat içinde mi kontrol et
     if (hoursRemaining < 0) {
       isUrgent = true;
-      urgentMessage = "Overdue"; 
+      urgentMessage = "Overdue";
     } else if (hoursRemaining <= 24) {
       isUrgent = true;
-      urgentMessage = `Last ${Math.ceil(hoursRemaining)} hour!`; 
+      urgentMessage = `Last ${Math.ceil(hoursRemaining)} hour!`;
     }
 
     return { isUrgent, isCompleted, urgentMessage };
@@ -88,10 +89,24 @@ const TaskItem = ({ task, onDelete, onEdit, onToggleStatus }) => {
 
   const { isUrgent, isCompleted, urgentMessage } = getDeadlineInfo();
 
+  let currentUserId = null;
+  let isAdmin = false;
+  try {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decoded = jwtDecode(token);
+      currentUserId = decoded.id;
+      isAdmin = decoded.role === 'admin';
+    }
+  } catch (e) { }
+
+  const assignedToName = task.assignedTo ? (typeof task.assignedTo === 'object' ? task.assignedTo.name : 'Unknown') : null;
+  const isAssignedToOther = task.assignedTo && (typeof task.assignedTo === 'object' ? task.assignedTo._id !== currentUserId : task.assignedTo !== currentUserId);
+
   // Dosya var mı kontrolü
   const hasFiles = task.attachments && task.attachments.length > 0;
   // İlk dosyanın linki (Hızlı erişim için)
-  const firstFileUrl = hasFiles ? `http://localhost:5050/${task.attachments[0].filePath}` : '#';
+  const firstFileUrl = hasFiles ? `http://localhost:5050${task.attachments[0].storagePath}` : '#';
 
   const cardClasses = [
     styles.taskCard,
@@ -102,11 +117,11 @@ const TaskItem = ({ task, onDelete, onEdit, onToggleStatus }) => {
   const handleEdit = (e) => { e.stopPropagation(); onEdit(task); };
   const handleDelete = (e) => { e.stopPropagation(); onDelete(task._id); };
   const handleToggle = (e) => { e.stopPropagation(); onToggleStatus(task); };
-  
-  
+
+
   return (
     <div className={cardClasses.join(' ')} onClick={handleEdit}>
-      
+
       {/* Kartın Başlık ve Aksiyon İkonları Bölümü */}
       <div className={styles.cardHeader}>
         <h3>{task.title}</h3> {/* Görev Başlığı */}
@@ -126,21 +141,36 @@ const TaskItem = ({ task, onDelete, onEdit, onToggleStatus }) => {
       <div className={styles.cardMiddle}>
         {/* Görev Açıklaması */}
         {task.description && <p className={styles.description}>{task.description}</p>}
-        
+
         {/* Tarih ve Saat Gösterimi */}
         {task.dueDate ? (
           <div className={styles.dateTimeWrapper}>
             <span className={styles.dateTime}>
               <FaCalendarAlt /> {formatDisplayDate(task.dueDate)} {/* Formatlanmış Tarih */}
             </span>
-            {task.dueTime && ( 
+            {task.dueTime && (
               <span className={styles.dateTime}>
                 <FaClock /> {task.dueTime} {/* Saat Bilgisi */}
               </span>
             )}
           </div>
         ) : (
-          <span className={styles.dateTime}>&nbsp;</span> 
+          <span className={styles.dateTime}>&nbsp;</span>
+        )}
+
+
+        {/* Assigned to OTHER */}
+        {(isAdmin || isAssignedToOther) && assignedToName && (
+          <div className={styles.assignedTo}>
+            <small>Assigned to: <strong>{assignedToName}</strong></small>
+          </div>
+        )}
+
+        {/* Assigned to ME */}
+        {!isAssignedToOther && task.assignedTo && (
+          <div className={styles.assignedTo}>
+            <small>Assigned by: <strong>{task.user?.name || 'Unknown'}</strong></small>
+          </div>
         )}
       </div>
 
@@ -151,31 +181,47 @@ const TaskItem = ({ task, onDelete, onEdit, onToggleStatus }) => {
           <span className={`${styles.categoryTag} ${getCategoryTagClass(task.category)}`}>
             {task.category}
           </span>
-          
+
           {/* Dosya İkonu ve Sayısı*/}
           {hasFiles && (
-             <a 
-               href={firstFileUrl}
-               target="_blank"
-               rel="noopener noreferrer"
-               className={styles.attachmentBadge}
-               onClick={(e) => e.stopPropagation()} // Karta tıklamayı engelle, sadece dosyayı aç
-               title={`${task.attachments.length} file(s) attached`}
-             >
-               <FaPaperclip />
-               <span>{task.attachments.length}</span>
-             </a>
+            <div
+              className={styles.attachmentBadge}
+              onClick={(e) => {
+                e.stopPropagation();
+                const token = localStorage.getItem('token');
+                const file = task.attachments[0];
+                const url = `http://localhost:5050/api/tasks/attachments/${file.attachmentId}`;
+
+                fetch(url, {
+                  headers: { 'Authorization': `Bearer ${token}` }
+                })
+                  .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.blob();
+                  })
+                  .then(blob => {
+                    const fileUrl = window.URL.createObjectURL(blob);
+                    window.open(fileUrl, '_blank');
+                  })
+                  .catch(err => console.error("Download error:", err));
+              }}
+              title={`${task.attachments.length} file(s) attached`}
+              style={{ cursor: 'pointer' }}
+            >
+              <FaPaperclip />
+              <span>{task.attachments.length}</span>
+            </div>
           )}
-          
+
           {/*Aciliyet Uyarısı (eğer acilse ve mesaj varsa) */}
           {isUrgent && (
             <span className={styles.urgentText}>
               <FaExclamationTriangle /> {urgentMessage} {/* Uyarı Metni */}
             </span>
           )}
-          
+
         </div>
-        
+
         {/* Görev Tamamlama Butonu (Checkbox) */}
         <button className={styles.checkButton} onClick={handleToggle}>
           {isCompleted ? (

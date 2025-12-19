@@ -1,4 +1,4 @@
-require('dotenv').config(); 
+require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
@@ -13,11 +13,9 @@ connectDB();
 
 const app = express();
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
 // Frontend'in backend'e erişmesine izin verir
-app.use(cors()); 
-app.use(express.json()); 
+app.use(cors());
+app.use(express.json());
 
 // Temel bir test rotası
 app.get('/', (req, res) => {

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate, Link } from 'react-router-dom';
 import styles from './Navbar.module.css';
-import { jwtDecode } from 'jwt-decode'; 
-import ThemeToggle from './ThemeToggle'; 
+import { jwtDecode } from 'jwt-decode';
+import ThemeToggle from './ThemeToggle';
 
-import logoImage from '../assets/logo.png'; 
+import logoImage from '../assets/logo.png';
 
 import bearAvatar from '../assets/bear.png';
 import beeAvatar from '../assets/bee.png';
@@ -14,7 +14,7 @@ import pandaAvatar from '../assets/panda.png';
 const Logo = () => (
   <img src={logoImage} alt="TaskMintLogo" className={styles.logoImage} />
 );
- 
+
 const avatarMap = {
   'Bear': bearAvatar,
   'Bee': beeAvatar,
@@ -36,11 +36,25 @@ const getAvatarFromToken = () => {
   return 'Bear';
 };
 
+const getNameFromToken = () => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    try {
+      const decodedToken = jwtDecode(token);
+      return decodedToken.name || '';
+    } catch (error) {
+      return '';
+    }
+  }
+  return '';
+};
+
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const [currentAvatarName, setCurrentAvatarName] = useState(getAvatarFromToken());
   const [profileAvatarSrc, setProfileAvatarSrc] = useState(avatarMap[currentAvatarName]);
+  const [userName, setUserName] = useState(getNameFromToken());
 
   useEffect(() => {
     setProfileAvatarSrc(avatarMap[currentAvatarName]);
@@ -51,27 +65,31 @@ const Navbar = () => {
     const handleStorageChange = (e) => {
       if (e.key === 'token') {
         setCurrentAvatarName(getAvatarFromToken());
+        setUserName(getNameFromToken());
       }
     };
     const handleAvatarUpdated = () => {
       setCurrentAvatarName(getAvatarFromToken());
+      setUserName(getNameFromToken());
     };
 
     window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('avatarUpdated', handleAvatarUpdated); 
+    window.addEventListener('avatarUpdated', handleAvatarUpdated);
 
     setCurrentAvatarName(getAvatarFromToken());
+    setUserName(getNameFromToken());
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('avatarUpdated', handleAvatarUpdated);
     };
-  }, []); 
+  }, []);
 
   const handleSignOut = () => {
-    localStorage.removeItem('token'); 
-    setCurrentAvatarName('Bear'); 
-    setIsDropdownOpen(false); 
+    localStorage.removeItem('token');
+    setCurrentAvatarName('Bear');
+    setUserName('');
+    setIsDropdownOpen(false);
     navigate('/login');
   };
 
@@ -84,31 +102,61 @@ const Navbar = () => {
             <Logo />
             <span>TaskMint</span>
           </div>
-          <NavLink 
-            to="/dashboard" 
-            className={({ isActive }) => 
+          <NavLink
+            to="/dashboard"
+            className={({ isActive }) =>
               `${styles.navLink} ${isActive ? styles.activeLink : ''}`
             }
           >
             Dashboard
           </NavLink>
-          <NavLink 
-            to="/analysis" 
-            className={({ isActive }) => 
+          <NavLink
+            to="/analysis"
+            className={({ isActive }) =>
               `${styles.navLink} ${isActive ? styles.activeLink : ''}`
             }
           >
             Analysis
           </NavLink>
+          {getAvatarFromToken() && (
+            (() => {
+              const token = localStorage.getItem('token');
+              if (token) {
+                try {
+                  const decoded = jwtDecode(token);
+                  if (decoded.role === 'admin') {
+                    return (
+                      <NavLink
+                        to="/admin"
+                        className={({ isActive }) =>
+                          `${styles.navLink} ${isActive ? styles.activeLink : ''}`
+                        }
+                      >
+                        Admin Panel
+                      </NavLink>
+                    );
+                  }
+                } catch (e) { }
+              }
+              return null;
+            })()
+          )}
         </div>
 
         {/* SAĞ TARAF */}
         <div className={styles.navRight}>
-          
-          {/* 1. Profil Dropdown  */}
+
+          {/* Welcome Message */}
+          {userName && (
+            <span style={{ marginRight: '15px', color: 'var(--text-navbar)', fontWeight: '500' }}>
+              Welcome, {userName}
+            </span>
+          )}
+
+          {/* Profil Dropdown  */}
           <div className={styles.profileDropdown}>
-            <button 
-              className={styles.profileButton} 
+            <button
+              className={styles.profileButton}
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               onBlur={() => setTimeout(() => setIsDropdownOpen(false), 150)}
             >
@@ -118,12 +166,12 @@ const Navbar = () => {
                 <div className={styles.profilePlaceholder}></div>
               )}
             </button>
-            
+
             {isDropdownOpen && (
               <div className={styles.dropdownMenu}>
-                <Link 
-                  to="/profile" 
-                  className={styles.dropdownLink} 
+                <Link
+                  to="/profile"
+                  className={styles.dropdownLink}
                   onClick={() => setIsDropdownOpen(false)}
                 >
                   Profile Settings
@@ -134,7 +182,7 @@ const Navbar = () => {
               </div>
             )}
           </div>
-          <ThemeToggle /> 
+          <ThemeToggle />
 
         </div>
       </div>

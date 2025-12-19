@@ -29,28 +29,44 @@ const StatisticsPage = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const chartRef = useRef(null);
-  
-  const [chartTextColor, setChartTextColor] = useState('#F0F0FF'); 
+
+  const [chartTextColor, setChartTextColor] = useState('#F0F0FF');
+
+  const [summaryStats, setSummaryStats] = useState({ total: 0, completed: 0, incomplete: 0 });
 
   useEffect(() => {
-    const lightModeColor = '#212529'; 
-    const darkModeColor = '#F0F0FF';  
+    const lightModeColor = '#212529';
+    const darkModeColor = '#F0F0FF';
 
     const currentTheme = localStorage.getItem('theme') || document.documentElement.getAttribute('data-theme') || 'dark';
 
     setChartTextColor(currentTheme === 'light' ? lightModeColor : darkModeColor);
-  }, []); 
+  }, []);
 
   const processDataForChart = (stats) => {
+    let total = 0;
+    let completedTotal = 0;
+    let incompleteTotal = 0;
+
     const categories = stats.map(s => s.category);
     const completedData = stats.map(s => {
       const completed = s.statuses.find(status => status.status === 'Completed');
-      return completed ? completed.count : 0;
+      const count = completed ? completed.count : 0;
+      completedTotal += count;
+      return count;
     });
     const incompleteData = stats.map(s => {
       const incomplete = s.statuses.find(status => status.status === 'Incomplete');
-      return incomplete ? incomplete.count : 0;
+      const count = incomplete ? incomplete.count : 0;
+      incompleteTotal += count;
+      return count;
     });
+
+    // Calculate total from all categories
+    total = stats.reduce((acc, curr) => acc + curr.totalTasks, 0);
+
+    setSummaryStats({ total, completed: completedTotal, incomplete: incompleteTotal });
+
     return {
       labels: categories,
       datasets: [
@@ -96,13 +112,13 @@ const StatisticsPage = () => {
       legend: {
         position: 'top',
         labels: {
-          color: chartTextColor, 
+          color: chartTextColor,
         },
       },
       title: {
         display: true,
         text: 'Task Distribution by Category',
-        color: chartTextColor, 
+        color: chartTextColor,
         font: { size: 18 },
       },
     },
@@ -110,19 +126,19 @@ const StatisticsPage = () => {
       x: {
         stacked: true,
         ticks: {
-          color: chartTextColor, 
+          color: chartTextColor,
         },
         grid: {
-          color: 'rgba(160, 160, 184, 0.2)', 
+          color: 'rgba(160, 160, 184, 0.2)',
         },
       },
       y: {
         stacked: true,
         ticks: {
-          color: chartTextColor, 
+          color: chartTextColor,
         },
         grid: {
-          color: 'rgba(160, 160, 184, 0.2)', 
+          color: 'rgba(160, 160, 184, 0.2)',
         },
       },
     },
@@ -138,6 +154,22 @@ const StatisticsPage = () => {
         <button className={styles.exportButton} onClick={handleExportAsPNG}>
           Export Graph
         </button>
+      </div>
+
+      {/* Summary Cards */}
+      <div className={styles.statsGrid}>
+        <div className={styles.statCard} style={{ borderLeft: '4px solid #5A80FF' }}>
+          <span className={styles.statLabel}>Total Tasks</span>
+          <span className={styles.statValue}>{summaryStats.total}</span>
+        </div>
+        <div className={styles.statCard} style={{ borderLeft: '4px solid #3DCC91' }}>
+          <span className={styles.statLabel}>Completed</span>
+          <span className={styles.statValue}>{summaryStats.completed}</span>
+        </div>
+        <div className={styles.statCard} style={{ borderLeft: '4px solid #FBBF24' }}>
+          <span className={styles.statLabel}>Incomplete</span>
+          <span className={styles.statValue}>{summaryStats.incomplete}</span>
+        </div>
       </div>
       <div className={styles.chartContainer}>
         {chartData && chartData.labels.length > 0 ? (

@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 import styles from './TaskModal.module.css';
 
 // O anki tarihi YYYY-MM-DD formatında alır 
 const getTodayDate = () => {
   const now = new Date();
   const year = now.getFullYear();
-  const month = (now.getMonth() + 1).toString().padStart(2, '0'); 
+  const month = (now.getMonth() + 1).toString().padStart(2, '0');
   const day = now.getDate().toString().padStart(2, '0');
   return `${year}-${month}-${day}`;
 };
@@ -23,15 +24,31 @@ const TaskModal = ({ onClose, taskToEdit, onTaskSaved }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('Job');
-  
+
   const [dueDate, setDueDate] = useState(getTodayDate());
-  const [dueTime, setDueTime] = useState(getCurrentTime()); 
+  const [dueTime, setDueTime] = useState(getCurrentTime());
+  const [assignedTo, setAssignedTo] = useState('');
+  const [users, setUsers] = useState([]);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const [files, setFiles] = useState([]);
-  
+
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        setIsAdmin(decoded.role === 'admin');
+        if (decoded.role === 'admin') {
+          fetchUsers(token);
+        }
+      } catch (e) {
+        console.error("Token decode error", e);
+      }
+    }
+
     if (taskToEdit) {
       setTitle(taskToEdit.title);
       setDescription(taskToEdit.description || '');
@@ -39,14 +56,35 @@ const TaskModal = ({ onClose, taskToEdit, onTaskSaved }) => {
       if (taskToEdit.dueDate) {
         setDueDate(new Date(taskToEdit.dueDate).toISOString().split('T')[0]);
       }
-      if (taskToEdit.dueTime) { 
+      if (taskToEdit.dueTime) {
         setDueTime(taskToEdit.dueTime);
+      }
+      if (taskToEdit.assignedTo) {
+        // assignedTo, nesne (populate edilmiş) veya ID olabilir
+        setAssignedTo(typeof taskToEdit.assignedTo === 'object' ? taskToEdit.assignedTo._id : taskToEdit.assignedTo);
       }
     }
   }, [taskToEdit]);
 
+  const fetchUsers = async (token) => {
+    try {
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      const { data } = await axios.get('http://localhost:5050/api/auth/users', config);
+      setUsers(data);
+    } catch (err) {
+      console.error("Failed to fetch users", err);
+    }
+  };
+
   const handleFileChange = (e) => {
-    setFiles(e.target.files); // FileList objesini state'e at
+    // Yeni seçilen dosyaları mevcut dosyaların üzerine ekle (append)
+    const newFiles = Array.from(e.target.files || []);
+    setFiles((prevFiles) => [...prevFiles, ...newFiles]);
+  };
+
+  // Yeni eklenen (henüz yüklenmemiş) dosyayı listeden çıkarma
+  const handleRemovePendingFile = (index) => {
+    setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
   };
 
   // Dosya Silme Fonksiyonu
@@ -61,7 +99,7 @@ const TaskModal = ({ onClose, taskToEdit, onTaskSaved }) => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      
+
       // Başarılı olursa listeyi güncellemek için ana sayfayı tetikle veya modalı kapat/aç
       alert('File deleted successfully');
       onTaskSaved(); // Listeyi yenile
@@ -80,13 +118,13 @@ const TaskModal = ({ onClose, taskToEdit, onTaskSaved }) => {
     if (dueDate && dueTime) {
       const selectedDateTime = new Date(`${dueDate}T${dueTime}`);
       const now = new Date();
-      
-      if (selectedDateTime < new Date(now.getTime() - 60000)) { 
+
+      if (selectedDateTime < new Date(now.getTime() - 60000)) {
         setError('You cannot set a deadline in the past.');
-        return; 
+        return;
       }
     }
-    
+
     const token = localStorage.getItem('token');
 
     // --- FormData Kullanımı ---
@@ -98,6 +136,9 @@ const TaskModal = ({ onClose, taskToEdit, onTaskSaved }) => {
     formData.append('dueDate', dueDate);
     formData.append('dueTime', dueTime);
     formData.append('status', taskToEdit ? taskToEdit.status : 'Incomplete');
+    if (assignedTo !== undefined && assignedTo !== null) {
+      formData.append('assignedTo', assignedTo);
+    }
 
     // Dosyaları ekle (Backend 'attachments' anahtarını bekliyor)
     if (files) {
@@ -117,7 +158,7 @@ const TaskModal = ({ onClose, taskToEdit, onTaskSaved }) => {
         // PUT isteği (FormData ile)
         await axios.put(
           `http://localhost:5050/api/tasks/${taskToEdit._id}`,
-          formData, 
+          formData,
           config
         );
       } else {
@@ -137,7 +178,7 @@ const TaskModal = ({ onClose, taskToEdit, onTaskSaved }) => {
       <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
         <button className={styles.closeButton} onClick={onClose}>×</button>
         <h2>{taskToEdit ? 'Edit Task' : 'Create New Task'}</h2>
-        
+
         {error && <p className={styles.error}>{error}</p>}
 
         <form onSubmit={handleSubmit}>
@@ -168,14 +209,59 @@ const TaskModal = ({ onClose, taskToEdit, onTaskSaved }) => {
           {/* --- Dosya Yükleme Alanı --- */}
           <div className={styles.formGroup}>
             <label htmlFor="attachments">Attachments (Max 10MB - PDF, Img, Doc)</label>
+
+            {/* Native file input gizli (Tarayıcının Türkçe metnini göstermemek için) */}
             <input
               type="file"
               id="attachments"
               multiple // Birden fazla dosya seçimine izin ver
               onChange={handleFileChange}
-              className={styles.fileInput}
+              className={styles.hiddenFileInput}
               accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx" // İzin verilen uzantılar
             />
+
+            {/* Custom İngilizce dosya seçme alanı */}
+            <div className={styles.filePickerRow}>
+              <label htmlFor="attachments" className={styles.fileButton}>
+                Choose files
+              </label>
+
+              <span className={styles.fileHint}>
+                {files.length === 0 ? 'No file chosen' : `${files.length} file(s) added`}
+              </span>
+            </div>
+
+            {/* Yeni Eklenen Dosyaların Listesi */}
+            {files.length > 0 && (
+              <ul className={styles.attachmentList} style={{ marginTop: '0.5rem' }}>
+                {files.map((file, index) => (
+                  <li key={index} className={styles.attachmentItem}>
+                    <div className={styles.fileInfo}>
+                      <span className={styles.fileName}>{file.name}</span>
+                      <span className={styles.fileMeta}>
+                        {(file.size / 1024).toFixed(1)} KB
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleRemovePendingFile(index)}
+                      className={styles.deleteFileButton}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: '#ef4444',
+                        cursor: 'pointer',
+                        fontWeight: 'bold',
+                        fontSize: '1.2rem',
+                        lineHeight: 1
+                      }}
+                    >
+                      ×
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
           {/* --- Mevcut Dosyaları Listeleme ve Silme --- */}
@@ -186,41 +272,76 @@ const TaskModal = ({ onClose, taskToEdit, onTaskSaved }) => {
                 {taskToEdit.attachments.map((file, index) => (
                   <li key={index} className={styles.attachmentItem}>
                     <div className={styles.fileInfo}>
-                      <span className={styles.fileName}>
-                        {file.fileName}
+                      <span className={styles.fileName} title={file.originalFileName}>
+                        {file.originalFileName}
                       </span>
                       <span className={styles.fileMeta}>
                         {(file.fileSize / 1024).toFixed(1)} KB • {new Date(file.uploadDate).toLocaleDateString()}
                       </span>
                     </div>
-                    
+
                     <div className={styles.fileActions}>
-                        {/* İndirme Linki */}
-                        <a 
-                          href={`http://localhost:5050/${file.filePath}`} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
+                      <div className={styles.actionButtonsRow}>
+                        {/* İndirme/Önizleme Linki */}
+                        <span
+                          onClick={async () => {
+                            try {
+                              const token = localStorage.getItem('token');
+                              const response = await axios.get(
+                                `http://localhost:5050/api/tasks/attachments/${file.attachmentId}`,
+                                {
+                                  headers: { Authorization: `Bearer ${token}` },
+                                  responseType: 'blob'
+                                }
+                              );
+                              // Blob'dan URL oluştur ve yeni sekmede aç
+                              const fileUrl = window.URL.createObjectURL(new Blob([response.data], { type: file.fileType === 'pdf' ? 'application/pdf' : 'image/jpeg' }));
+                              window.open(fileUrl, '_blank');
+                            } catch (err) {
+                              console.error("File download failed", err);
+                              alert("Could not load file");
+                            }
+                          }}
                           className={styles.viewLink}
-                          style={{ marginRight: '10px' }}
+                          title="View"
                         >
                           View
-                        </a>
+                        </span>
 
-                        {/* --- Silme Butonu --- */}
-                        <button 
-                            type="button" 
-                            onClick={() => handleDeleteFile(file._id)}
-                            style={{ 
-                                background: 'none', 
-                                border: 'none', 
-                                color: '#ef4444', 
-                                cursor: 'pointer', 
-                                fontWeight: 'bold',
-                                fontSize: '0.85rem'
-                            }}
+                        {/* Download Link */}
+                        <span
+                          onClick={async () => {
+                            try {
+                              const response = await axios.get(
+                                `http://localhost:5050/api/tasks/attachments/${file.attachmentId}`,
+                                { responseType: 'blob' }
+                              );
+                              const fileUrl = window.URL.createObjectURL(new Blob([response.data]));
+                              const link = document.createElement('a');
+                              link.href = fileUrl;
+                              link.setAttribute('download', file.originalFileName || 'download.file');
+                              document.body.appendChild(link);
+                              link.click();
+                              link.remove();
+                            } catch (err) {
+                              console.error("File download failed", err);
+                              alert("Could not download file");
+                            }
+                          }}
+                          className={styles.downloadLink}
                         >
-                            Delete
-                        </button>
+                          Download
+                        </span>
+                      </div>
+
+                      {/* --- Silme Butonu --- */}
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteFile(file._id)}
+                        className={styles.deleteFileButton}
+                      >
+                        Delete
+                      </button>
                     </div>
                   </li>
                 ))}
@@ -239,7 +360,7 @@ const TaskModal = ({ onClose, taskToEdit, onTaskSaved }) => {
                   value={dueDate}
                   onChange={(e) => setDueDate(e.target.value)}
                   className={styles.dateInput}
-                  min={getTodayDate()} 
+                  min={getTodayDate()}
                 />
                 <input
                   type="time"
@@ -250,7 +371,7 @@ const TaskModal = ({ onClose, taskToEdit, onTaskSaved }) => {
                 />
               </div>
             </div>
-            
+
             {/* Kategori (Category) */}
             <div className={styles.formGroup} style={{ flex: 1 }}>
               <label htmlFor="category">Category</label>
@@ -258,7 +379,7 @@ const TaskModal = ({ onClose, taskToEdit, onTaskSaved }) => {
                 id="category"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                data-category={category} 
+                data-category={category}
               >
                 <option value="Job">Job</option>
                 <option value="Personal">Personal</option>
@@ -267,6 +388,27 @@ const TaskModal = ({ onClose, taskToEdit, onTaskSaved }) => {
               </select>
             </div>
           </div>
+
+          {/* Admin Assignment */}
+          {isAdmin && (
+            <div className={styles.formGroup}>
+              <label htmlFor="assignedTo">Assign To (Admin Only)</label>
+              <select
+                id="assignedTo"
+                value={assignedTo}
+                onChange={(e) => setAssignedTo(e.target.value)}
+                className={styles.selectInput}
+              >
+                <option value="">Select User</option>
+                {users.map((user) => (
+                  <option key={user._id} value={user._id}>
+                    {user.name} ({user.email})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
 
           {/* Form Eylemleri (Butonlar) */}
           <div className={styles.formActions}>
@@ -278,8 +420,8 @@ const TaskModal = ({ onClose, taskToEdit, onTaskSaved }) => {
             </button>
           </div>
         </form>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 };
 

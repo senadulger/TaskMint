@@ -13,7 +13,7 @@ const registerUser = asyncHandler(async (req, res) => {
   if (userExists) {
     return res.status(400).json({ message: 'User with this email already exists' });
   }
-  const user = await User.create({ name, email, password});
+  const user = await User.create({ name, email, password });
 
   if (user) {
     res.status(201).json({
@@ -22,7 +22,7 @@ const registerUser = asyncHandler(async (req, res) => {
       email: user.email,
       role: user.role,
       avatar: user.avatar,
-      token: generateToken(user._id, user.name, user.email, user.avatar), 
+      token: generateToken(user._id, user.name, user.email, user.avatar, user.role),
     });
   } else {
     return res.status(400).json({ message: 'Invalid user data' });
@@ -41,7 +41,7 @@ const loginUser = asyncHandler(async (req, res) => {
       email: user.email,
       role: user.role,
       avatar: user.avatar || 'Bear',
-      token: generateToken(user._id, user.name, user.email, user.avatar || 'Bear'), 
+      token: generateToken(user._id, user.name, user.email, user.avatar || 'Bear', user.role),
     });
   } else {
     return res.status(401).json({ message: 'Invalid email or password' });
@@ -70,7 +70,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
       name: updatedUser.name,
       email: updatedUser.email,
       avatar: updatedUser.avatar || 'Bear',
-      token: generateToken(updatedUser._id, updatedUser.name, updatedUser.email, updatedUser.avatar || 'Bear'), 
+      token: generateToken(updatedUser._id, updatedUser.name, updatedUser.email, updatedUser.avatar || 'Bear', updatedUser.role),
     });
   } else {
     return res.status(404).json({ message: 'User not found' });
@@ -84,7 +84,7 @@ const updateUserPassword = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: 'Please provide both current and new passwords' });
   }
   if (newPassword.length < 6) {
-     return res.status(400).json({ message: 'New password must be at least 6 characters long'});
+    return res.status(400).json({ message: 'New password must be at least 6 characters long' });
   }
   const user = await User.findById(req.user._id);
   if (user && (await bcrypt.compare(currentPassword, user.password))) {
@@ -92,7 +92,7 @@ const updateUserPassword = asyncHandler(async (req, res) => {
     await user.save();
     res.json({ message: 'Password updated successfully' });
   } else {
-    return res.status(401).json({message: 'Invalid current password'});
+    return res.status(401).json({ message: 'Invalid current password' });
   }
 });
 
@@ -101,8 +101,23 @@ const updateUserPassword = asyncHandler(async (req, res) => {
 // @access  Private/Admin
 const getAllUsers = asyncHandler(async (req, res) => {
   // Veritabanındaki tüm kullanıcıları bul ama 'password' alanını getirme (Güvenlik)
-  const users = await User.find({}).select('-password'); 
+  const users = await User.find({}).select('-password');
   res.json(users);
+});
+
+// @desc    Kullanıcı silme (Admin)
+// @route   DELETE /api/auth/users/:id
+// @access  Private/Admin
+const deleteUser = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id);
+
+  if (user) {
+    await user.deleteOne();
+    res.json({ message: 'User removed' });
+  } else {
+    res.status(404);
+    throw new Error('User not found');
+  }
 });
 
 module.exports = {
@@ -112,4 +127,5 @@ module.exports = {
   updateUserProfile,
   updateUserPassword,
   getAllUsers,
+  deleteUser,
 };

@@ -1,5 +1,5 @@
 const request = require('supertest');
-const app = require('../index'); 
+const app = require('../index');
 const mongoose = require('mongoose');
 const User = require('../models/User');
 const Task = require('../models/Task');
@@ -12,13 +12,13 @@ const tempFilePath = path.join(__dirname, 'temp_test_file.pdf'); //geçici bir p
 
 // Testler başlamadan önce yapılacak hazırlıklar
 beforeAll(async () => {
-    // 1. Sahte bir PDF dosyası oluştur (İçine rastgele yazı yaz)
+    // Sahte bir PDF dosyası oluştur (İçine rastgele yazı yaz)
     fs.writeFileSync(tempFilePath, 'Bu bir test dosyasidir.');
 
-    // 2. Varsa eski kullanıcıyı temizle
+    // Varsa eski kullanıcıyı temizle
     await User.findOneAndDelete({ email: userEmail });
-    
-    // 3. Kullanıcı oluştur ve giriş yap
+
+    // Kullanıcı oluştur ve giriş yap
     await request(app).post('/api/auth/register').send({
         name: "Task Tester",
         email: userEmail,
@@ -36,11 +36,11 @@ beforeAll(async () => {
 // Testler bitince yapılacak temizlik
 afterAll(async () => {
     const user = await User.findOne({ email: userEmail });
-    if(user) {
+    if (user) {
         await Task.deleteMany({ user: user._id });
         await User.findOneAndDelete({ email: userEmail });
     }
-    
+
     // Test bitince oluşturduğumuz sahte dosyayı sil
     if (fs.existsSync(tempFilePath)) {
         fs.unlinkSync(tempFilePath);
@@ -62,7 +62,7 @@ describe('Task API Endpoints', () => {
             .field('category', 'Job')
             .field('status', 'Incomplete')
             .field('description', 'Testing file upload via Jest')
-            .attach('attachments', tempFilePath); 
+            .attach('attachments', tempFilePath);
 
         // Hata ayıklama: Eğer 500 alırsak hatayı görelim
         if (res.statusCode !== 201) {
@@ -72,10 +72,10 @@ describe('Task API Endpoints', () => {
         expect(res.statusCode).toEqual(201);
         expect(res.body).toHaveProperty('_id');
         expect(res.body.title).toBe('Test Task with File');
-        
+
         expect(res.body.attachments).toBeDefined();
         expect(res.body.attachments.length).toBeGreaterThan(0);
-        
+
         taskId = res.body._id;
     });
 
