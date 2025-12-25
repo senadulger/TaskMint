@@ -7,7 +7,7 @@ const storage = multer.memoryStorage();
 // Dosya Formatı Kontrolü (Gereksinim 8.1)
 // Supported: PDF, PNG, JPG, DOCX, XLSX
 const checkFileType = (file, cb) => {
-  const filetypes = /jpg|jpeg|png|pdf|doc|docx|xls|xlsx/;
+  const filetypes = /jpg|png|pdf|docx|xlsx/;
   // Dosya uzantısını kontrol et
   const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
   // Dosya MIME tipini kontrol et

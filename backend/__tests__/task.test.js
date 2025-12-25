@@ -35,6 +35,7 @@ beforeAll(async () => {
 
 // Testler bitince yapılacak temizlik
 afterAll(async () => {
+    // Oluşturulan test kullanıcısını ve görevlerini sil
     const user = await User.findOne({ email: userEmail });
     if (user) {
         await Task.deleteMany({ user: user._id });

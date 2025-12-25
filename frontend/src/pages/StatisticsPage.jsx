@@ -62,7 +62,7 @@ const StatisticsPage = () => {
       return count;
     });
 
-    // Calculate total from all categories
+    // Bütün görevlerin toplam sayısını hesapla
     total = stats.reduce((acc, curr) => acc + curr.totalTasks, 0);
 
     setSummaryStats({ total, completed: completedTotal, incomplete: incompleteTotal });

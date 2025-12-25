@@ -23,7 +23,6 @@ const getTasks = asyncHandler(async (req, res) => {
     }).populate('assignedTo', 'name').populate('user', 'name');
   }
 
-
   res.json(tasks);
 });
 
@@ -37,7 +36,7 @@ const createTask = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: 'Please provide title, category, and status' });
   }
 
-  // --- VERITABANI DOSYA İŞLEME ---
+  // --- VERİTABANI DOSYA İŞLEME ---
   // Önce Task nesnesini oluştur (ID'si olsun diye)
   const taskId = new mongoose.Types.ObjectId();
 

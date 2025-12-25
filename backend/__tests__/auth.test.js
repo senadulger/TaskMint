@@ -1,5 +1,5 @@
 const request = require('supertest');
-const app = require('../index'); 
+const app = require('../index');
 const mongoose = require('mongoose');
 const User = require('../models/User');
 
@@ -16,6 +16,9 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+    // Oluşturulan test kullanıcısını sil
+    await User.findOneAndDelete({ email: userData.email });
+
     // Test bitince veritabanı bağlantısını kapat
     await mongoose.connection.close();
 });
@@ -26,7 +29,7 @@ describe('Auth API Tests', () => {
         const res = await request(app)
             .post('/api/auth/register')
             .send(userData);
-        
+
         expect(res.statusCode).toEqual(201);
         expect(res.body).toHaveProperty('token');
         expect(res.body).toHaveProperty('role', 'user'); // Varsayılan rol kontrolü
