@@ -88,9 +88,11 @@ JWT_SECRET=your_jwt_secret_key
     npm run dev
     ```
 
-## 6. Project Demo Video (TODO)
+## 6. Project Demo Video
 
 Check out the project demonstration video to see the main features and overall workflow of the application.
+
+https://github.com/user-attachments/assets/457f2587-e589-40b6-be0d-c37d882f5120
 
 ## 7. Project Report
 
