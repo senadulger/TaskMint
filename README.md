@@ -1,4 +1,4 @@
-# TaskMint – Task Management Web Application
+# TaskMint – Task Management Web Application 
 
 ## 1. About the Project
 
